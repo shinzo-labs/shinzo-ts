@@ -1,0 +1,29 @@
+# Contributing to Shinzo
+
+## Overview
+
+Contributions to this codebase are welcomed and appreciated. We encourage novice and professional developers alike to help improve the quality of our software, which is offered as a benefit to the open source community.
+
+## Guidelines
+
+### Issues
+
+If you would like to raise any issues, please do so in the [Issues](https://github.com/shinzo-labs/shinzo/issues) section and a core contributor will respond in a timely manner. Issue threads may be closed if there are no additional comments added within 7 days of the last update by a contributor on the thread.
+
+### Code Contributions
+
+If you would like to contribute code to the codebase, you may review the open issues in [Issues](https://github.com/shinzo-labs/shinzo/issues) to participate in discussion or ask to be assigned directly to it. If you would like to suggest a feature that is not already captured in the Issues section, please open a new Issue ticket. 
+
+Once you have been assigned an issue, the steps to contribute are:
+1. Create a fork version of the repo.
+2. Open a branch with a name prefixed with `feat/`, `fix/`, or `chore/` depending on the nature of the change. Use your best judgement when deciding on the prefix.
+3. Implement the desired changes.
+4. Add tests to any relevant test suites to validate functionality.
+5. Run `npx @changesets/cli` in the relevant section to add a `changeset` for each distinct change in your feature. Read the relevant Changeset README in the section for more info.
+6. Open a Pull Request from your forked repo back to the main repo. Tag one of the core contributors as a reviewer.
+7. Once the core contributor has reviewed the code and all comments have been resolved, the PR will be approved and merged into the `main` branch.
+8. Merged changes will be added to a versioned package release on a regular schedule.
+
+## Contact
+
+If you have any questions or comments about the guidelines here or anything else about the software, feel free to join the discussion on our [Discord server](https://discord.gg/qrVWEuRh) or contact austin@shinzolabs.com.
