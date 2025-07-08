@@ -1,9 +1,9 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-import { initializeAgentObservability, TelemetryConfig } from "shinzo";
+import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js";
 
 // Create MCP server
 const server = new Server(
@@ -34,7 +34,7 @@ const telemetryConfig: TelemetryConfig = {
   },
   dataProcessors: [
     // Add demo-specific processing
-    (telemetryData) => {
+    (telemetryData: any) => {
       console.log("📊 Processing telemetry data:", {
         method: telemetryData.methodName,
         tool: telemetryData.toolName,
@@ -47,83 +47,118 @@ const telemetryConfig: TelemetryConfig = {
 };
 
 // Initialize telemetry with console output
-const telemetry = initializeAgentObservability(server, telemetryConfig);
+const telemetry = initializeAgentObservability(server as any, telemetryConfig);
 
-// Simple calculation tool
-server.tool("calculate", "Perform basic calculations", 
-  { 
-    operation: z.enum(["add", "subtract", "multiply", "divide"]).describe("Mathematical operation"),
-    a: z.number().describe("First number"),
-    b: z.number().describe("Second number")
-  }, 
-  async ({ operation, a, b }) => {
-    let result: number;
-    
-    switch (operation) {
-      case "add":
-        result = a + b;
-        break;
-      case "subtract":
-        result = a - b;
-        break;
-      case "multiply":
-        result = a * b;
-        break;
-      case "divide":
-        if (b === 0) {
-          throw new Error("Division by zero is not allowed");
+// Tool handler functions
+async function handleCalculate(operation: string, a: number, b: number) {
+  let result: number;
+  
+  switch (operation) {
+    case "add":
+      result = a + b;
+      break;
+    case "subtract":
+      result = a - b;
+      break;
+    case "multiply":
+      result = a * b;
+      break;
+    case "divide":
+      if (b === 0) {
+        throw new Error("Division by zero is not allowed");
+      }
+      result = a / b;
+      break;
+    default:
+      throw new Error(`Unknown operation: ${operation}`);
+  }
+  
+  return {
+    operation,
+    operands: [a, b],
+    result,
+    timestamp: new Date().toISOString()
+  };
+}
+
+async function handleTextTransform(text: string, transformation: string) {
+  let result: string | number;
+  
+  switch (transformation) {
+    case "uppercase":
+      result = text.toUpperCase();
+      break;
+    case "lowercase":
+      result = text.toLowerCase();
+      break;
+    case "reverse":
+      result = text.split('').reverse().join('');
+      break;
+    case "length":
+      result = text.length;
+      break;
+    default:
+      throw new Error(`Unknown transformation: ${transformation}`);
+  }
+  
+  return {
+    originalText: text,
+    transformation,
+    result,
+    timestamp: new Date().toISOString()
+  };
+}
+
+// Add tool handlers
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  return {
+    tools: [
+      {
+        name: "calculate",
+        description: "Perform basic calculations",
+        inputSchema: {
+          type: "object",
+          properties: {
+            operation: {
+              type: "string",
+              enum: ["add", "subtract", "multiply", "divide"],
+              description: "Mathematical operation"
+            },
+            a: {
+              type: "number",
+              description: "First number"
+            },
+            b: {
+              type: "number",
+              description: "Second number"
+            }
+          },
+          required: ["operation", "a", "b"]
         }
-        result = a / b;
-        break;
-      default:
-        throw new Error(`Unknown operation: ${operation}`);
-    }
-    
-    return {
-      operation,
-      operands: [a, b],
-      result,
-      timestamp: new Date().toISOString()
-    };
-  }
-);
+      },
+      {
+        name: "text_transform",
+        description: "Transform text strings",
+        inputSchema: {
+          type: "object",
+          properties: {
+            text: {
+              type: "string",
+              description: "Text to transform"
+            },
+            transformation: {
+              type: "string",
+              enum: ["uppercase", "lowercase", "reverse", "length"],
+              description: "Type of transformation"
+            }
+          },
+          required: ["text", "transformation"]
+        }
+      }
+    ]
+  };
+});
 
-// String manipulation tool
-server.tool("text_transform", "Transform text strings", 
-  { 
-    text: z.string().describe("Text to transform"),
-    transformation: z.enum(["uppercase", "lowercase", "reverse", "length"]).describe("Type of transformation")
-  }, 
-  async ({ text, transformation }) => {
-    let result: string | number;
-    
-    switch (transformation) {
-      case "uppercase":
-        result = text.toUpperCase();
-        break;
-      case "lowercase":
-        result = text.toLowerCase();
-        break;
-      case "reverse":
-        result = text.split('').reverse().join('');
-        break;
-      case "length":
-        result = text.length;
-        break;
-      default:
-        throw new Error(`Unknown transformation: ${transformation}`);
-    }
-    
-    return {
-      originalText: text,
-      transformation,
-      result,
-      timestamp: new Date().toISOString()
-    };
-  }
-);
-
-// Handle server requests
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
   
@@ -131,20 +166,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   
   switch (name) {
     case "calculate":
+      const result1 = await handleCalculate(args?.operation as string, args?.a as number, args?.b as number);
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await server.tools.get("calculate")?.handler(args), null, 2)
+            text: JSON.stringify(result1, null, 2)
           }
         ]
       };
     case "text_transform":
+      const result2 = await handleTextTransform(args?.text as string, args?.transformation as string);
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(await server.tools.get("text_transform")?.handler(args), null, 2)
+            text: JSON.stringify(result2, null, 2)
           }
         ]
       };

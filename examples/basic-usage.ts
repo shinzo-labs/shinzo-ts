@@ -1,9 +1,9 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-import { initializeAgentObservability, TelemetryConfig } from "shinzo";
+import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js";
 
 // Create MCP server
 const server = new Server(
@@ -22,21 +22,23 @@ const server = new Server(
 const telemetryConfig: TelemetryConfig = {
   serviceName: "my-mcp-server",
   serviceVersion: "1.2.0",
-  exporterEndpoint: "https://api.mydomain.com/v1/traces",
-  exporterAuth: {
+  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/traces",
+  exporterAuth: process.env.OTEL_AUTH_TOKEN ? {
     type: "bearer",
-    token: process.env.TELEMETRY_AUTH_TOKEN
-  },
-  samplingRate: 0.8, // Sample 80% of requests
-  enableUserConsent: true,
-  enablePIISanitization: true,
+    token: process.env.OTEL_AUTH_TOKEN
+  } : undefined,
+  samplingRate: parseFloat(process.env.OTEL_SAMPLING_RATE || "1.0"),
+  enableUserConsent: process.env.ENABLE_USER_CONSENT === "true",
+  enablePIISanitization: process.env.ENABLE_PII_SANITIZATION !== "false",
   customAttributes: {
     environment: process.env.NODE_ENV || "development",
-    region: process.env.AWS_REGION || "us-east-1"
+    region: process.env.AWS_REGION || "us-east-1",
+    deployment: process.env.DEPLOYMENT_ID || "local",
+    version: process.env.APP_VERSION || "1.0.0"
   },
   dataProcessors: [
     // Custom processor to remove sensitive data
-    (telemetryData) => {
+    (telemetryData: any) => {
       if (telemetryData.toolName === "sensitive_operation") {
         if (telemetryData.parameters) {
           delete telemetryData.parameters.apiKey;
@@ -48,17 +50,39 @@ const telemetryConfig: TelemetryConfig = {
 };
 
 // Initialize telemetry
-const telemetry = initializeAgentObservability(server, telemetryConfig);
+const telemetry = initializeAgentObservability(server as any, telemetryConfig);
 
-// Add a simple tool
+// Add tool handlers
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  return {
+    tools: [
+      {
+        name: "return_a",
+        description: "Return A",
+        inputSchema: {
+          type: "object",
+          properties: {
+            a: {
+              type: "number",
+              description: "A number to return"
+            }
+          },
+          required: ["a"]
+        }
+      }
+    ]
+  };
+});
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
     case "return_a":
+      const a = request.params.arguments?.a as number;
       return {
         content: [
           {
             type: "text",
-            text: `Returning: ${request.params.arguments?.a}`
+            text: `Returning: ${a}`
           }
         ]
       };
@@ -67,17 +91,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-// Register tool
-server.tool("return_a", "Return A", 
-  { 
-    a: z.number().describe("A number to return") 
-  }, 
-  async ({ a }) => a
-);
-
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {
-  console.log('Shutting down telemetry...');
   await telemetry.shutdown();
   process.exit(0);
 });
@@ -86,7 +101,7 @@ process.on('SIGINT', async () => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.log("MCP server running with Shinzo telemetry enabled");
+  // MCP servers should not log to stdout as it interferes with JSON communication
 }
 
 main().catch(console.error);
