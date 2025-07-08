@@ -2,7 +2,7 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { PeriodicExportingMetricReader, MetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base';
 import { trace, metrics, context, SpanStatusCode, SpanKind } from '@opentelemetry/api';
@@ -40,7 +40,7 @@ export class TelemetryManager implements ObservabilityInstance {
     this.sdk = new NodeSDK({
       resource,
       traceExporter: this.config.enableTracing ? traceExporter : undefined,
-      metricReader: this.config.enableMetrics ? metricExporter : undefined,
+      metricReader: this.config.enableMetrics ? (metricExporter as any) : undefined,
     });
 
     this.sdk.start();
@@ -77,7 +77,7 @@ export class TelemetryManager implements ObservabilityInstance {
     });
   }
 
-  private createMetricExporter() {
+  private createMetricExporter(): MetricReader | undefined {
     if (this.config.exporterType === 'console') {
       return undefined;
     }
