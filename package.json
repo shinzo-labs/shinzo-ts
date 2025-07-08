@@ -7,12 +7,18 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "test:runner": "ts-node test/test-runner.ts",
+    "test:integration": "jest --testNamePattern=\"Integration Tests\" --passWithNoTests",
+    "test:unit": "jest --testNamePattern=\"^(?!.*Integration Tests).*\" --passWithNoTests",
     "lint": "eslint src/**/*.ts",
     "prepare": "pnpm run build",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist coverage .nyc_output junit.xml test-results.xml",
     "prepack": "pnpm run clean && pnpm run build",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test:ci": "jest --coverage --ci --watchAll=false --passWithNoTests"
   },
   "keywords": [
     "mcp",
@@ -45,6 +51,7 @@
     "jest": "^29.0.0",
     "@types/jest": "^29.0.0",
     "ts-jest": "^29.0.0",
+    "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
