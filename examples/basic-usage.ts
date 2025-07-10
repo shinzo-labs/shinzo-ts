@@ -1,7 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
 
 import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js";
 
@@ -49,9 +48,6 @@ const telemetryConfig: TelemetryConfig = {
   ]
 };
 
-// Initialize telemetry
-const telemetry = initializeAgentObservability(server as any, telemetryConfig);
-
 // Add tool handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
@@ -90,6 +86,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       throw new Error(`Unknown tool: ${request.params.name}`);
   }
 });
+
+// Initialize telemetry
+const telemetry = initializeAgentObservability(server as any, telemetryConfig);
 
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {

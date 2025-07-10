@@ -137,7 +137,7 @@ async function handleProcessFile(filename: string, content: string) {
       processedCharacters: content.length,
       processingTime
     };
-    
+
     telemetry.recordMetric("file.processing.duration", processingTime, {
       "file.type": filename.split('.').pop() || "unknown"
     });
