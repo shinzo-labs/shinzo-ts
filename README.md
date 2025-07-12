@@ -68,7 +68,9 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 
 ## ⚙️ Setup
 
-> 🚧 This section is currently under construction. See the [Roadmap](#roadmap) section for current status ond progress on features.
+<blockquote style="border-left: 6px solid #ffe066; padding: 0.75em 1em;">
+  🚧 <strong>This section is currently under construction.</strong> See the <a href="#roadmap">Roadmap</a> section for current status and progress on features.
+</blockquote>
 
 ## 🗺️ Roadmap
 
