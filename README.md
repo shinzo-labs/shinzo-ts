@@ -9,10 +9,10 @@
     <p align=center>
         <a href="https://github.com/shinzo-labs/shinzo/stargazers">
             <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fshinzo-labs%2Fshinzo%2Fstargazers&query=%24.length&logo=github&label=stars&color=e3b341" alt="Stars">
-            </a>
+        </a>
         <a href="https://github.com/shinzo-labs/shinzo/forks">
             <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fshinzo-labs%2Fshinzo%2Fforks&query=%24.length&logo=github&label=forks&color=8957e5" alt="Forks">
-            </a>
+        </a>
         <a href="https://github.com/shinzo-labs/shinzo/pulls">
             <img src="https://img.shields.io/badge/build-passing-green" alt="Build">
         </a>
@@ -35,30 +35,30 @@
 </div>
 
 <details>
-  <summary>Table of Contents</summary>
+  <summary>📋 Table of Contents</summary>
 
-  - [About Shinzo](#about-shinzo)
-    - [System Architecture](#system-architecture)
-    - [Key Features](#key-features)
-  - [Setup](#setup)
-  - [Roadmap](#roadmap)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Contact](#contact)
-  - [Additional Resources](##additional-resources)
+  - [🤖 About Shinzo](#about-shinzo)
+    - [🏗️ System Architecture](#system-architecture)
+    - [✨ Key Features](#key-features)
+  - [⚙️ Setup](#setup)
+  - [🗺️ Roadmap](#roadmap)
+  - [🤝 Contributing](#contributing)
+  - [📄 License](#license)
+  - [📞 Contact](#contact)
+  - [📚 Additional Resources](##additional-resources)
 </details>
 
-## About Shinzo
+## 🤖 About Shinzo
 
 Shinzo is an open, composable analytics stack purpose-built for developers and publishers building MCP ([Model Context Protocol](https://modelcontextprotocol.io/introduction)) servers and agentic AI systems, with the goal to put powerful, privacy-conscious telemetry and analysis tools directly in the hands of server developers. All components adhere to [OpenTelemetry](https://opentelemetry.io/docs/) conventions, making it easy to connect Shinzo to other [OpenTelemetry-compatible software](https://opentelemetry.io/ecosystem/vendors/).
 
-### System Architecture
+### 🏗️ System Architecture
 
 - **Drop-In Instrumentation SDK**: Drop-in OpenTelemetry-compatible SDK for MCP servers. Install with a single command to auto-instrument your server and export telemetry to the collector of your choice.
 - **Telemetry Collector**: High-performance OpenTelemetry backend service with support for data sanitization, secure storage, and configurable retention attributes.
 - **Analytics Dashboard**: Frontend dashboard for real-time analytics, trace analysis, performance profiling, tool usage stats, and more.
 
-### Key Features
+### ✨ Key Features
 
 - **Automatic Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.
 - **Anonymous, Configurable Telemetry**: Built-in PII sanitization and user consent mechanisms ensure you always remain compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation.
@@ -66,42 +66,47 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 - **Custom Analytics Dashboards**: Self-hosted, real-time dashboards for tool usage, performance, and traces.
 - **OpenTelemetry-Compatible**: Since the entire stack meets OpenTelemetry standard conventions, developers can mix-and-match our components with any OpenTelemetry-compatible service.
 
-## Setup
+## ⚙️ Setup
 
 > 🚧 This section is currently under construction. See the [Roadmap](#roadmap) section for current status ond progress on features.
 
-## Roadmap
+## 🗺️ Roadmap
 
 > _Note: For the complete roadmap timeline with all issues, see the [Roadmap](https://github.com/orgs/shinzo-labs/projects/1/views/4) page on Github._
 
-- [x] **Phase 0** (June 2025):
-  - [x] System Architecture Design
-  - [ ] Contributor Operations
-- [ ] **Phase 1** (July 2025):
-  - [ ] OpenTelemetry MCP semantic conventions
-  - [ ] TypeScript Instrumentation SDK
-- [ ] **Phase 2** (August 2025):
-  - [ ] Telemetry Collector
-- [ ] **Phase 3** (September 2025):
-  - [ ] Analytics Dashboard
-  - [ ] Agentic Analysis
-- [ ] **Phase 4** (Q4 2025):
-  - [ ] Python Instrumentation SDK
-  - [ ] Java Instrumentation SDK
-  - [ ] Rust Instrumentation SDK
-  - [ ] Kotlin Instrumentation SDK
-- [ ] **Phase 5 and Beyond** (2026+):
-  - [ ] Server publishing and deployment
-  - [ ] Incident response system
-  - [ ] MCP server auto-reconfiguration
-  - [ ] Industry vertical solutions
-  - [ ] Business Intelligence
+- ✅ **Phase 0** _(June 2025)_
+  - ✅ 🏗️ System Architecture Design
+  - ✅ 🤝 Contributor Operations
 
-## Contributing
+- ⬜️ **Phase 1** _(July 2025)_
+  - ⬜️ 📏 OpenTelemetry MCP semantic conventions
+  - ⬜️ 🛠️ TypeScript Instrumentation SDK
+
+- ⬜️ **Phase 2** _(August 2025)_
+  - ⬜️ 📡 Telemetry Collector
+
+- ⬜️ **Phase 3** _(September 2025)_
+  - ⬜️ 📊 Analytics Dashboard
+  - ⬜️ 🧠 Agentic Analysis
+
+- ⬜️ **Phase 4** _(Q4 2025)_
+  - ⬜️ 🐍 Python Instrumentation SDK
+  - ⬜️ ☕ Java Instrumentation SDK
+  - ⬜️ 🦀 Rust Instrumentation SDK
+  - ⬜️ 🦘 Kotlin Instrumentation SDK
+
+- ⬜️ **Phase 5 & Beyond** _(2026+)_
+  - ⬜️ 🚀 Server publishing & deployment
+  - ⬜️ 🚨 Incident response system
+  - ⬜️ 🔄 MCP server auto-reconfiguration
+  - ⬜️ 🏭 Industry vertical solutions
+  - ⬜️ 📈 Business Intelligence
+
+## 🤝 Contributing
 
 Contributions to Shinzo are appreciated, whether you are a veteran building sophisticated enterprise AI agent systems or a newcomer just testing the waters. Shinzo accepts contributions both in terms of direct code contributions as well as non-technical support like community engagement, user testing, and professional partnerships. Feel free to join the conversation on our [Discord server](https://discord.gg/qrVWEuRh) and checkout  the [Contributing](./CONTRIBUTING.md) page to learn how you can become a contributor.
 
-## License
+## 📄 License
 
 Shinzo is [fair-code](https://faircode.io) software distributed under the [Sustainable Use License](./LICENSE.md) and [Shinzo Enterprise License](./LICENSE_EE.md).
 
@@ -113,11 +118,11 @@ Enterprise licenses are available for additional features and support through [S
 
 We believe that the fair-code license model offers a strong compromise between democratizing the benefits of open software while ensuring long-term sustainability of software maintenance and operations. Our specific license model is adapted from [n8n](https://github.com/n8n-io/n8n/tree/master), with additional context for the origin of the licenses [here](https://docs.n8n.io/reference/license/).
 
-## Contact
+## 📞 Contact
 
 Contact Austin Born (austin@shinzolabs.com, [@austinbuilds](https://x.com/austinbuilds)) if you have any questions or comments related to this software.
 
-## Additional Resources
+## 📚 Additional Resources
 
 * [Model Context Protocol](https://modelcontextprotocol.io/introduction)
 * [OpenTelemetry](https://opentelemetry.io/docs/)
