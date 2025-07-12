@@ -33,7 +33,7 @@ Once you have been assigned an issue, the steps to contribute are:
 4. Add tests to any relevant test suites to validate functionality.
 5. Run `npx @changesets/cli` in the relevant component to add a `changeset` for each distinct change in your feature. Read the relevant component's changeset documentation for more details.
 6. Open a Pull Request from your forked repo back to the main repo. Tag one of the core contributors as a reviewer.
-7. Please follow the automated CLA Assistant bot instructions to sign the [Contributor License Agreement](./CONTRIBUTOR_LICENSE_AGREEMENT.md). We will not be able to accept your contribution without completing this step.
+7. A comment will be added to your PR from the CLA Assistant bot regarding signing our [Contributor License Agreement](./CONTRIBUTOR_LICENSE_AGREEMENT.md). Please follow the steps to sign, otherwise we will not be able to accept your contribution.
 8. Once the core contributor has reviewed the code and all comments have been resolved, the PR will be approved and merged into the `main` branch.
 9. Merged changes will be added to a versioned package release on a regular schedule.
 

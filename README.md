@@ -43,6 +43,7 @@
   - [Setup](#setup)
   - [Roadmap](#roadmap)
   - [Contributing](#contributing)
+  - [License](#license)
   - [Contact](#contact)
   - [Additional Resources](##additional-resources)
 </details>
@@ -59,9 +60,9 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 
 ### Key Features
 
-- **Auto-Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.
-- **Anonymous, Configurable Telemetry**: PII sanitization and flexible sampling ensures you only collect the data you want.
-- **Automated User Consent**: Remain compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation with our built-in mechanisms for user consent.
+- **Automatic Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.
+- **Anonymous, Configurable Telemetry**: Built-in PII sanitization and user consent mechanisms ensure you always remain compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation.
+- **Full Control**: All components of Shinzo can be self-hosted with our sustainable use license or cloud hosted through Shinzo Labs.
 - **Custom Analytics Dashboards**: Self-hosted, real-time dashboards for tool usage, performance, and traces.
 - **OpenTelemetry-Compatible**: Since the entire stack meets OpenTelemetry standard conventions, developers can mix-and-match our components with any OpenTelemetry-compatible service.
 
@@ -99,6 +100,18 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 ## Contributing
 
 Contributions to Shinzo are appreciated, whether you are a veteran building sophisticated enterprise AI agent systems or a newcomer just testing the waters. Shinzo accepts contributions both in terms of direct code contributions as well as non-technical support like community engagement, user testing, and professional partnerships. Feel free to join the conversation on our [Discord server](https://discord.gg/qrVWEuRh) and checkout  the [Contributing](./CONTRIBUTING.md) page to learn how you can become a contributor.
+
+## License
+
+Shinzo is [fair-code](https://faircode.io) software distributed under the [Sustainable Use License](./LICENSE.md) and [Shinzo Enterprise License](./LICENSE_EE.md).
+
+- **Source Available**: Always visible source code
+- **Self-Hostable**: Deploy anywhere
+- **Extensible**: Add your own features or functionality
+
+Enterprise licenses are available for additional features and support through [Shinzo Labs](mailto:austin@shinzolabs.com).
+
+We believe that the fair-code license model offers a strong compromise between democratizing the benefits of open software while ensuring long-term sustainability of software maintenance and operations. Our specific license model is adapted from [n8n](https://github.com/n8n-io/n8n/tree/master), with additional context for the origin of the licenses [here](https://docs.n8n.io/reference/license/).
 
 ## Contact
 
