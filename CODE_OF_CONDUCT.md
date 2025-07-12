@@ -61,7 +61,7 @@ representative at an online or offline event.
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement. Reports can be
 made to Austin Born at austin@shinzolabs.com. If an incident pertains to Austin
-Born, reports should be made to other relevant community leaders such as
+Born, reports should be made to another relevant community leader such as
 moderators of a given space or other major contributors to the codebase.
 All complaints will be reviewed and investigated promptly and fairly.
 

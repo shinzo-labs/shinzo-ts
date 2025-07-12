@@ -12,6 +12,10 @@ Contributions to this codebase are welcomed and appreciated. We encourage novice
 - **Performance is a top priority**: Minimal overhead, maximum insight.
 - **Democratize the power of AI**: Build open, accessible tools for all agentic developers.
 
+## Code of Conduct
+
+As a member of our community, you are expected to follow all rules in our [Contributor Covenant Code of Conduct](./CODE_OF_CONDUCT.md). Please report unacceptable behavior through the channels specified in the covenant.
+
 ## Technical Contributions
 
 ### Issues
@@ -29,8 +33,9 @@ Once you have been assigned an issue, the steps to contribute are:
 4. Add tests to any relevant test suites to validate functionality.
 5. Run `npx @changesets/cli` in the relevant component to add a `changeset` for each distinct change in your feature. Read the relevant component's changeset documentation for more details.
 6. Open a Pull Request from your forked repo back to the main repo. Tag one of the core contributors as a reviewer.
-7. Once the core contributor has reviewed the code and all comments have been resolved, the PR will be approved and merged into the `main` branch.
-8. Merged changes will be added to a versioned package release on a regular schedule.
+7. Please follow the automated CLA Assistant bot instructions to sign the [Contributor License Agreement](./CONTRIBUTOR_LICENSE_AGREEMENT.md). We will not be able to accept your contribution without completing this step.
+8. Once the core contributor has reviewed the code and all comments have been resolved, the PR will be approved and merged into the `main` branch.
+9. Merged changes will be added to a versioned package release on a regular schedule.
 
 ## Non-Technical Contributions
 

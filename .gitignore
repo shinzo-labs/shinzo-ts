@@ -1,0 +1,15 @@
+# IDEs
+.claude
+.vscode
+.idea
+.cursor*
+
+# Build output
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# Env files
+.env
+.env.*
