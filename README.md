@@ -16,8 +16,8 @@
         <a href="https://github.com/shinzo-labs/shinzo/pulls">
             <img src="https://img.shields.io/badge/build-passing-green" alt="Build">
         </a>
-        <a href="https://github.com/shinzo-labs/shinzo/pulls">
-            <img src="https://img.shields.io/badge/PRs-welcome-339933?logo=github" alt="PRs welcome">
+        <a href="https://github.com/shinzo-labs/shinzo/graphs/contributors">
+            <img src="https://img.shields.io/badge/contributors-welcome-339933?logo=github" alt="contributors welcome">
         </a>
         <a href="https://discord.gg/UYUdSdp5N8">
             <img src="https://discord-live-members-count-badge.vercel.app/api/discord-members?guildId=1079318797590216784" alt="Discord">
@@ -33,12 +33,6 @@
         </a>
     </p>
 </div>
-
-> 🚧 This software is still in development so 
-
- Under construction emoji
-
-
 
 <details>
   <summary>Table of Contents</summary>
@@ -76,39 +70,38 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 
 ## Setup
 
-TODO
-
-### Prerequisites
-
-To use Shinzo, you must have an existing MCP server written in Typescript, using the `@modelcontextprotocol` sdk
-
-### Installation
-
-TODO
-
-## Usage
-
-In the file where you initialize your server, import the telemetry and config (if applicable)
-
-```typescript
-import { initializeAgentObservability, TelemetryConfig } from "@shinzolabs/shinzo/observability.js";
-```
+> 🚧 This section is currently under construction. See the [Roadmap](#roadmap) section for current status ond progress on features.
 
 ## Roadmap
 
-- [x] Add Changelog
-- [x] Add back to top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
+> _Note: For the complete roadmap timeline with all issues, see the [Roadmap](https://github.com/orgs/shinzo-labs/projects/1/views/4) page on Github._
 
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
+- [x] **Phase 0** (June 2025):
+  - [x] System Architecture Design
+  - [ ] Contributor Operations
+- [ ] **Phase 1** (July 2025):
+  - [ ] OpenTelemetry MCP semantic conventions
+  - [ ] TypeScript Instrumentation SDK
+- [ ] **Phase 2** (August 2025):
+  - [ ] Telemetry Collector
+- [ ] **Phase 3** (September 2025):
+  - [ ] Analytics Dashboard
+  - [ ] Agentic Analysis
+- [ ] **Phase 4** (Q4 2025):
+  - [ ] Python Instrumentation SDK
+  - [ ] Java Instrumentation SDK
+  - [ ] Rust Instrumentation SDK
+  - [ ] Kotlin Instrumentation SDK
+- [ ] **Phase 5 and Beyond** (2026+):
+  - [ ] Server publishing and deployment
+  - [ ] Incident response system
+  - [ ] MCP server auto-reconfiguration
+  - [ ] Industry vertical solutions
+  - [ ] Business Intelligence
 
 ## Contributing
 
-Contributions to Shinzo are appreciated, whether you are a veteran building sophisticated enterprise AI agent systems or a newcomer just testing the waters. Shinzo accepts contributions both in terms of direct code contributions as well as non-technical support like community engagement, user testing, and professional partnerships. Please see our [Contributing](./CONTRIBUTING.md) page to learn how you can become a part of the contributor community.
+Contributions to Shinzo are appreciated, whether you are a veteran building sophisticated enterprise AI agent systems or a newcomer just testing the waters. Shinzo accepts contributions both in terms of direct code contributions as well as non-technical support like community engagement, user testing, and professional partnerships. Feel free to join the conversation on our [Discord server](https://discord.gg/qrVWEuRh) and checkout  the [Contributing](./CONTRIBUTING.md) page to learn how you can become a contributor.
 
 ## Contact
 
@@ -118,5 +111,7 @@ Contact Austin Born (austin@shinzolabs.com, [@austinbuilds](https://x.com/austin
 
 * [Model Context Protocol](https://modelcontextprotocol.io/introduction)
 * [OpenTelemetry](https://opentelemetry.io/docs/)
+* [GDPR](https://gdpr.eu/what-is-gdpr/)
+* [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/)
 
 <p align="right">(<a href="">back to top</a>)</p>
