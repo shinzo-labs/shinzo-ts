@@ -1,7 +1,9 @@
 <a id="readme-top"></a>
 <div align="center">
     <a href="https://github.com/shinzo-labs/shinzo"><img src="https://github.com/user-attachments/assets/78542e5b-1da1-44ad-a3e2-5b4eb9e6a962" alt="Logo" width="256" height="256"></a>
-    <h1 align="center">Shinzo: The Composable Analytics Stack for MCP Servers</h1>
+    <h1 align="center">
+        Shinzo: The Composable Analytics Stack for MCP Servers
+    </h1>
     <p align=center>
         <a href="https://github.com/shinzo-labs/shinzo/stargazers"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fshinzo-labs%2Fshinzo%2Fstargazers&query=%24.length&logo=github&label=stars&color=e3b341" alt="Stars"></a>
         <a href="https://github.com/shinzo-labs/shinzo/forks"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fshinzo-labs%2Fshinzo%2Fforks&query=%24.length&logo=github&label=forks&color=8957e5" alt="Forks"></a>
