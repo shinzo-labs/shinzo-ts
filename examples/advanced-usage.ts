@@ -85,13 +85,13 @@ telemetry.addCustomAttribute("process_id", process.pid);
 async function handleDatabaseQuery(query: string, params?: any[]) {
   // Simulate database operation
   const startTime = Date.now();
-  
+
   // Create custom span for database operation
   const dbSpan = telemetry.createSpan("database.query", {
     "db.statement": query,
     "db.operation": query.split(' ')[0].toUpperCase()
   });
-  
+
   try {
     // Simulate query execution time
     await new Promise(resolve => setTimeout(resolve, Math.random() * 2000));
@@ -109,7 +109,7 @@ async function handleDatabaseQuery(query: string, params?: any[]) {
       rowCount: 2,
       executionTime: Date.now() - startTime
     };
-    
+
     dbSpan.end();
     return result;
   } catch (error) {
@@ -125,12 +125,12 @@ async function handleProcessFile(filename: string, content: string) {
     "file.name": filename,
     "file.size": content.length
   });
-  
+
   try {
     // Simulate processing time based on content length
     const processingTime = Math.min(content.length / 100, 3000);
     await new Promise(resolve => setTimeout(resolve, processingTime));
-    
+
     const result = {
       filename,
       processedLines: content.split('\n').length,
@@ -141,7 +141,7 @@ async function handleProcessFile(filename: string, content: string) {
     telemetry.recordMetric("file.processing.duration", processingTime, {
       "file.type": filename.split('.').pop() || "unknown"
     });
-    
+
     processingSpan.end();
     return result;
   } catch (error) {
@@ -164,7 +164,7 @@ async function handleErrorTest(shouldError: boolean, errorType: string = "intern
         throw new Error("Unknown error occurred");
     }
   }
-  
+
   return { success: true, message: "Operation completed successfully" };
 }
 
@@ -234,7 +234,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
-  
+
   switch (name) {
     case "database_query":
       const result1 = await handleDatabaseQuery(args?.query as string, args?.params as any[]);

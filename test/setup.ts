@@ -14,7 +14,7 @@ const originalConsoleLog = console.log;
 beforeEach(() => {
   // Reset all mocks before each test
   jest.clearAllMocks();
-  
+
   // Mock console methods to capture output
   console.error = jest.fn();
   console.warn = jest.fn();
@@ -26,7 +26,7 @@ afterEach(() => {
   console.error = originalConsoleError;
   console.warn = originalConsoleWarn;
   console.log = originalConsoleLog;
-  
+
   // Clear all timers
   jest.clearAllTimers();
 });
@@ -109,7 +109,7 @@ export const testUtils = {
    * Wait for next tick to allow async operations to complete
    */
   waitForNextTick: () => new Promise(resolve => process.nextTick(resolve)),
-  
+
   /**
    * Wait for a specific amount of time (works with fake timers)
    */
@@ -117,7 +117,7 @@ export const testUtils = {
     jest.advanceTimersByTime(ms);
     return new Promise(resolve => setTimeout(resolve, 0));
   },
-  
+
   /**
    * Create a mock function that can be awaited
    */
@@ -130,7 +130,7 @@ export const testUtils = {
     }
     return mock;
   },
-  
+
   /**
    * Create a mock server with default implementations
    */

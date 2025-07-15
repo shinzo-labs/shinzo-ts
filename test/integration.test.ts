@@ -19,7 +19,7 @@ describe('Integration Tests', () => {
   beforeEach(() => {
     // Setup mock server
     mockServer = new MockMcpServer('test-mcp-server', '1.0.0');
-    
+
     // Setup mock configuration
     mockConfig = {
       serviceName: 'test-mcp-service',
@@ -163,7 +163,7 @@ describe('Integration Tests', () => {
       observabilityInstance = initializeAgentObservability(mockServer, mockConfig);
 
       await mockServer.callTool('calculator', { operation: 'add', a: 1, b: 2 });
-      
+
       await expect(observabilityInstance.shutdown()).resolves.not.toThrow();
     });
 
@@ -223,7 +223,7 @@ describe('Integration Tests', () => {
       const endTime = Date.now();
 
       expect(results).toHaveLength(iterations);
-      
+
       // Performance should be reasonable
       const totalTime = endTime - startTime;
       expect(totalTime).toBeLessThan(5000); // Should complete in under 5 seconds
@@ -240,7 +240,7 @@ describe('Integration Tests', () => {
       const results = await Promise.all(promises);
 
       expect(results).toHaveLength(20);
-      
+
       // Verify all operations returned expected results
       results.forEach((result, index) => {
         expect(result).toEqual({ echo: `Message ${index}` });

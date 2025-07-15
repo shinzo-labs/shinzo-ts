@@ -42,14 +42,14 @@ class TestRunner {
 
   async run(): Promise<boolean> {
     console.log('🧪 Starting test runner...');
-    
+
     try {
       // Cleanup before running tests
       await this.cleanup();
-      
+
       // Run tests
       const success = await this.runTests();
-      
+
       if (success) {
         console.log('✅ All tests passed!');
         if (this.options.coverage) {
@@ -58,7 +58,7 @@ class TestRunner {
       } else {
         console.log('❌ Some tests failed!');
       }
-      
+
       return success;
     } catch (error) {
       console.error('💥 Test runner failed:', error);
@@ -73,7 +73,7 @@ class TestRunner {
 
   private async cleanup(): Promise<void> {
     console.log('🧹 Cleaning up test artifacts...');
-    
+
     for (const path of CLEANUP_PATHS) {
       const fullPath = join(this.projectRoot, path);
       if (existsSync(fullPath)) {
@@ -89,25 +89,25 @@ class TestRunner {
 
   private async runTests(): Promise<boolean> {
     console.log('🚀 Running tests...');
-    
+
     const args = ['jest'];
-    
+
     if (this.options.coverage) {
       args.push('--coverage');
     }
-    
+
     if (this.options.watch) {
       args.push('--watch');
     }
-    
+
     if (this.options.verbose) {
       args.push('--verbose');
     }
-    
+
     if (this.options.pattern) {
       args.push('--testNamePattern', this.options.pattern);
     }
-    
+
     // Add additional Jest options for better test isolation
     args.push(
       '--detectOpenHandles',
@@ -150,7 +150,7 @@ class TestRunner {
 
   private async generateCoverageReport(): Promise<void> {
     console.log('📊 Generating coverage report...');
-    
+
     const coveragePath = join(this.projectRoot, 'coverage');
     if (existsSync(coveragePath)) {
       console.log(`Coverage report available at: ${coveragePath}/lcov-report/index.html`);

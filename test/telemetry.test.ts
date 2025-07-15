@@ -80,11 +80,11 @@ describe('TelemetryManager', () => {
     it('should generate unique session ID', () => {
       const manager1 = new TelemetryManager(mockConfig);
       const manager2 = new TelemetryManager(mockConfig);
-      
+
       // Access private sessionId via any casting for testing
       const sessionId1 = (manager1 as any).sessionId;
       const sessionId2 = (manager2 as any).sessionId;
-      
+
       expect(sessionId1).not.toBe(sessionId2);
       expect(sessionId1).toMatch(/^mcp-session-\d+-[a-z0-9]+$/);
     });
@@ -108,7 +108,7 @@ describe('TelemetryManager', () => {
   describe('createSpan', () => {
     it('should create span with correct attributes', () => {
       const mockTracer = require('@opentelemetry/api').trace.getTracer();
-      
+
       const span = telemetryManager.createSpan('test-span', {
         'test.attribute': 'value'
       });
@@ -162,7 +162,7 @@ describe('TelemetryManager', () => {
   describe('addCustomAttribute', () => {
     it('should add custom attributes to config', () => {
       telemetryManager.addCustomAttribute('test.key', 'test.value');
-      
+
       const config = (telemetryManager as any).config;
       expect(config.customAttributes['test.key']).toBe('test.value');
     });
@@ -170,10 +170,10 @@ describe('TelemetryManager', () => {
     it('should initialize customAttributes if not present', () => {
       const configWithoutAttributes = { ...mockConfig };
       delete configWithoutAttributes.customAttributes;
-      
+
       const manager = new TelemetryManager(configWithoutAttributes);
       manager.addCustomAttribute('test.key', 'test.value');
-      
+
       const config = (manager as any).config;
       expect(config.customAttributes).toEqual({ 'test.key': 'test.value' });
     });
@@ -192,7 +192,7 @@ describe('TelemetryManager', () => {
       };
 
       const processed = telemetryManager.processTelemetryData(testData);
-      
+
       expect(processed.parameters?.email).toBe('[REDACTED]');
       expect(processed.parameters?.name).toBe('John Doe');
     });
@@ -209,7 +209,7 @@ describe('TelemetryManager', () => {
       };
 
       const manager = new TelemetryManager(configWithProcessor);
-      
+
       const testData: TelemetryData = {
         timestamp: Date.now(),
         sessionId: 'test-session',
@@ -217,7 +217,7 @@ describe('TelemetryManager', () => {
       };
 
       const processed = manager.processTelemetryData(testData);
-      
+
       expect(processor).toHaveBeenCalledWith(expect.objectContaining(testData));
       expect((processed as any).processed).toBe(true);
     });
@@ -229,7 +229,7 @@ describe('TelemetryManager', () => {
       };
 
       const manager = new TelemetryManager(configWithoutPII);
-      
+
       const testData: TelemetryData = {
         timestamp: Date.now(),
         sessionId: 'test-session',
@@ -240,7 +240,7 @@ describe('TelemetryManager', () => {
       };
 
       const processed = manager.processTelemetryData(testData);
-      
+
       expect(processed.parameters?.email).toBe('test@example.com');
     });
   });
@@ -248,16 +248,16 @@ describe('TelemetryManager', () => {
   describe('shutdown', () => {
     it('should shutdown SDK', async () => {
       const mockSdk = (telemetryManager as any).sdk;
-      
+
       await telemetryManager.shutdown();
-      
+
       expect(mockSdk.shutdown).toHaveBeenCalled();
     });
 
     it('should handle shutdown when SDK is not initialized', async () => {
       const manager = Object.create(TelemetryManager.prototype);
       manager.sdk = undefined;
-      
+
       await expect(manager.shutdown()).resolves.not.toThrow();
     });
   });

@@ -61,7 +61,7 @@ export class McpServerInstrumentation {
     return async (...args: any[]) => {
       const startTime = Date.now();
       const requestId = this.generateRequestId();
-      
+
       const spanName = this.createSpanName(type, name);
       const span = this.telemetryManager.createSpan(spanName, {
         'mcp.method.name': `${type}s/call`,

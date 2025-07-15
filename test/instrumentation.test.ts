@@ -13,7 +13,7 @@ describe('McpServerInstrumentation', () => {
 
   beforeEach(() => {
     mockServer = new MockMcpServer();
-    
+
     // Create mock span
     mockSpan = {
       setAttributes: jest.fn(),

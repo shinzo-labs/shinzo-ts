@@ -48,7 +48,7 @@ export class PIISanitizer {
 
   private sanitizeObject(obj: Record<string, any>): Record<string, any> {
     const sanitized: Record<string, any> = {};
-    
+
     for (const [key, value] of Object.entries(obj)) {
       // Check if key name suggests sensitive data
       if (this.isSensitiveKey(key)) {
@@ -57,7 +57,7 @@ export class PIISanitizer {
         sanitized[key] = this.sanitizeValue(value);
       }
     }
-    
+
     return sanitized;
   }
 
@@ -76,11 +76,11 @@ export class PIISanitizer {
 
   private sanitizeString(str: string): string {
     let sanitized = str;
-    
+
     for (const pattern of this.piiPatterns) {
       sanitized = sanitized.replace(pattern, '[REDACTED]');
     }
-    
+
     return sanitized;
   }
 
@@ -90,7 +90,7 @@ export class PIISanitizer {
       'apikey', 'api_key', 'access_token', 'refresh_token', 'bearer', 'credential',
       'ssn', 'social_security', 'credit_card', 'cc_number', 'cvv', 'pin'
     ];
-    
+
     return sensitiveKeys.some(sensitiveKey => 
       key.toLowerCase().includes(sensitiveKey)
     );

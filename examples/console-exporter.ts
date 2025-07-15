@@ -52,7 +52,7 @@ const telemetry = initializeAgentObservability(server as any, telemetryConfig);
 // Tool handler functions
 async function handleCalculate(operation: string, a: number, b: number) {
   let result: number;
-  
+
   switch (operation) {
     case "add":
       result = a + b;
@@ -72,7 +72,7 @@ async function handleCalculate(operation: string, a: number, b: number) {
     default:
       throw new Error(`Unknown operation: ${operation}`);
   }
-  
+
   return {
     operation,
     operands: [a, b],
@@ -83,7 +83,7 @@ async function handleCalculate(operation: string, a: number, b: number) {
 
 async function handleTextTransform(text: string, transformation: string) {
   let result: string | number;
-  
+
   switch (transformation) {
     case "uppercase":
       result = text.toUpperCase();
@@ -100,7 +100,7 @@ async function handleTextTransform(text: string, transformation: string) {
     default:
       throw new Error(`Unknown transformation: ${transformation}`);
   }
-  
+
   return {
     originalText: text,
     transformation,
@@ -161,9 +161,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
-  
+
   console.log(`🔧 Tool called: ${name} with args:`, args);
-  
+
   switch (name) {
     case "calculate":
       const result1 = await handleCalculate(args?.operation as string, args?.a as number, args?.b as number);
@@ -202,7 +202,7 @@ async function main() {
   console.log('🚀 Starting console demo server with telemetry...');
   console.log('📈 Telemetry will be output to console');
   console.log('🔧 Available tools: calculate, text_transform');
-  
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

@@ -11,11 +11,11 @@ export class ConfigValidator {
     if (!config.exporterEndpoint) {
       throw new Error('exporterEndpoint is required');
     }
-    
+
     if (config.samplingRate !== undefined && (config.samplingRate < 0 || config.samplingRate > 1)) {
       throw new Error('samplingRate must be between 0 and 1');
     }
-    
+
     if (config.exporterAuth) {
       this.validateAuthConfig(config.exporterAuth);
     }

@@ -6,9 +6,9 @@ export class MockMcpServer implements McpServerLike {
   _tools: Map<string, any>;
   _resources: Map<string, any>;
   _prompts: Map<string, any>;
-  
+
   private listeners: Map<string, Function[]>;
-  
+
   constructor(name: string = 'mock-server', version: string = '1.0.0') {
     this.name = name;
     this.version = version;
