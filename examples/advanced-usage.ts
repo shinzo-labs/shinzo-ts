@@ -24,7 +24,7 @@ const server = new Server(
 const telemetryConfig: TelemetryConfig = {
   serviceName: "advanced-mcp-server",
   serviceVersion: "2.0.0",
-  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/traces",
+  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/",
   exporterAuth: process.env.OTEL_AUTH_TOKEN ? {
     type: "bearer",
     token: process.env.OTEL_AUTH_TOKEN
@@ -35,7 +35,6 @@ const telemetryConfig: TelemetryConfig = {
   exporterType: "otlp-http",
   enableMetrics: true,
   enableTracing: true,
-  enableLogging: false,
   batchTimeout: 5000,
   maxBatchSize: 50,
   dataProcessors: [

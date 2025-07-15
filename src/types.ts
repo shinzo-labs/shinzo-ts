@@ -1,7 +1,7 @@
 export interface TelemetryConfig {
-  serviceName: string
-  serviceVersion: string
   exporterEndpoint: string
+  serviceName?: string
+  serviceVersion?: string
   exporterAuth?: {
     type: 'bearer' | 'apiKey' | 'basic'
     token?: string
@@ -9,15 +9,15 @@ export interface TelemetryConfig {
     username?: string
     password?: string
   }
-  samplingRate?: number
+  samplingRate?: number // For trace sampling (0.0 to 1.0)
+  metricExportIntervalMs?: number // How often to export metrics (default: 5000ms)
   enableUserConsent?: boolean
   enablePIISanitization?: boolean
   dataProcessors?: DataProcessor[]
   exporterType?: 'otlp-http' | 'otlp-grpc' | 'console'
   enableMetrics?: boolean
   enableTracing?: boolean
-  enableLogging?: boolean
-  batchTimeout?: number
+  batchTimeout?: number // For trace batching
   maxBatchSize?: number
 }
 
@@ -65,4 +65,9 @@ export interface ObservabilityInstance {
   shutdown(): Promise<void>
   createSpan(name: string, attributes?: Record<string, any>): any
   recordMetric(name: string, value: number, attributes?: Record<string, any>): void
+  recordCounter?(name: string, value?: number, attributes?: Record<string, any>): void
+  recordGauge?(name: string, value: number, attributes?: Record<string, any>): void
+  getTracer?(): any
+  getMeter?(): any
+  getSessionId?(): string
 }

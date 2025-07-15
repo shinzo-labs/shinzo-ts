@@ -1,6 +1,7 @@
 import { TelemetryManager } from './telemetry'
 import { TelemetryData, McpServerLike } from './types'
 import { SpanStatusCode } from '@opentelemetry/api'
+import { generateUuid } from './utils'
 
 export class McpServerInstrumentation {
   private telemetryManager: TelemetryManager
@@ -23,7 +24,6 @@ export class McpServerInstrumentation {
   }
 
   private instrumentToolCalls(): void {
-    // Hook into tool registration and execution
     const originalAddTool = this.server.tool?.bind(this.server)
     if (originalAddTool) {
       this.server.tool = (name: string, description: string, inputSchema: any, handler: Function) => {
@@ -34,7 +34,6 @@ export class McpServerInstrumentation {
   }
 
   private instrumentResourceReads(): void {
-    // Hook into resource registration and execution
     const originalAddResource = this.server.resource?.bind(this.server)
     if (originalAddResource) {
       this.server.resource = (uri: string, handler: Function) => {
@@ -45,7 +44,6 @@ export class McpServerInstrumentation {
   }
 
   private instrumentPromptCalls(): void {
-    // Hook into prompt registration and execution
     const originalAddPrompt = this.server.prompt?.bind(this.server)
     if (originalAddPrompt) {
       this.server.prompt = (name: string, description: string, handler: Function) => {
@@ -58,7 +56,7 @@ export class McpServerInstrumentation {
   private createInstrumentedHandler(originalHandler: Function, type: 'tool' | 'resource' | 'prompt', name: string): Function {
     return async (...args: any[]) => {
       const startTime = Date.now()
-      const requestId = this.generateRequestId()
+      const requestId = generateUuid()
 
       const span = this.telemetryManager.createSpan(`${type}s/call ${name}`, {
         'mcp.method.name': `${type}s/call`,
@@ -68,7 +66,7 @@ export class McpServerInstrumentation {
 
       const telemetryData: TelemetryData = {
         timestamp: startTime,
-        sessionId: this.generateSessionId(),
+        sessionId: generateUuid(),
         requestId,
         methodName: `${type}s/call`,
         [`${type}Name`]: name,
@@ -142,42 +140,26 @@ export class McpServerInstrumentation {
       return {}
     }
 
-    // For MCP tools, the first argument is typically the parameters object
     if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null) {
       return args[0]
     }
 
-    // For multiple arguments, create a parameters object
     return args.reduce((params, arg, index) => {
       params[`arg${index}`] = arg
       return params
     }, {})
   }
 
-  private generateRequestId(): string {
-    return `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-  }
-
-  private generateSessionId(): string {
-    return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-  }
-
   private emitTelemetryEvent(data: TelemetryData): void {
-    // Emit telemetry event if server supports events
-    if (this.server.emit) {
-      this.server.emit('telemetry', data)
-    }
+    if (this.server.emit) this.server.emit('telemetry', data)
   }
 
   public uninstrument(): void {
-    if (!this.isInstrumented) {
-      return
-    }
+    if (!this.isInstrumented) return
 
-    // Restore original methods
-    for (const [methodName, originalMethod] of this.originalMethods) {
+    this.originalMethods.forEach((originalMethod, methodName) => {
       (this.server as any)[methodName] = originalMethod
-    }
+    })
 
     this.originalMethods.clear()
     this.isInstrumented = false

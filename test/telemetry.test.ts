@@ -1,11 +1,17 @@
 import { TelemetryManager } from '../src/telemetry'
-import { TelemetryConfig, TelemetryData } from '../src/types'
+import { TelemetryConfig, TelemetryData, McpServerLike } from '../src/types'
 
 describe('TelemetryManager', () => {
   let telemetryManager: TelemetryManager
   let mockConfig: TelemetryConfig
+  let mockServer: McpServerLike
 
   beforeEach(() => {
+    mockServer = {
+      name: 'test-server',
+      version: '1.0.0'
+    }
+
     mockConfig = {
       serviceName: 'test-service',
       serviceVersion: '1.0.0',
@@ -16,7 +22,7 @@ describe('TelemetryManager', () => {
       samplingRate: 1.0
     }
 
-    telemetryManager = new TelemetryManager(mockConfig)
+    telemetryManager = new TelemetryManager(mockServer, mockConfig)
   })
 
   afterEach(() => {
@@ -33,15 +39,15 @@ describe('TelemetryManager', () => {
     })
 
     it('should generate unique session ID', () => {
-      const manager1 = new TelemetryManager(mockConfig)
-      const manager2 = new TelemetryManager(mockConfig)
+      const manager1 = new TelemetryManager(mockServer, mockConfig)
+      const manager2 = new TelemetryManager(mockServer, mockConfig)
 
       // Access private sessionId via any casting for testing
       const sessionId1 = (manager1 as any).sessionId
       const sessionId2 = (manager2 as any).sessionId
 
       expect(sessionId1).not.toBe(sessionId2)
-      expect(sessionId1).toMatch(/^mcp-session-\d+-[a-z0-9]+$/)
+      expect(typeof sessionId1).toBe('string')
     })
 
     it('should merge default config with user config', () => {
@@ -51,7 +57,7 @@ describe('TelemetryManager', () => {
         exporterEndpoint: 'http://localhost:4318'
       }
 
-      const manager = new TelemetryManager(partialConfig)
+      const manager = new TelemetryManager(mockServer, partialConfig)
       const config = (manager as any).config
 
       expect(config.enablePIISanitization).toBe(true)
@@ -128,7 +134,7 @@ describe('TelemetryManager', () => {
         dataProcessors: [processor]
       }
 
-      const manager = new TelemetryManager(configWithProcessor)
+      const manager = new TelemetryManager(mockServer, configWithProcessor)
 
       const testData: TelemetryData = {
         timestamp: Date.now(),
@@ -148,7 +154,7 @@ describe('TelemetryManager', () => {
         enablePIISanitization: false
       }
 
-      const manager = new TelemetryManager(configWithoutPII)
+      const manager = new TelemetryManager(mockServer, configWithoutPII)
 
       const testData: TelemetryData = {
         timestamp: Date.now(),

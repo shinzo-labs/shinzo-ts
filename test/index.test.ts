@@ -29,7 +29,6 @@ jest.doMock('../src/config', () => ({
     exporterType: 'otlp-http',
     enableMetrics: true,
     enableTracing: true,
-    enableLogging: false,
     batchTimeout: 2000,
     maxBatchSize: 100,
     dataProcessors: []

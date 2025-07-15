@@ -1,28 +1,31 @@
 import { TelemetryConfig, AuthConfig } from './types'
 
 export const DEFAULT_CONFIG: Partial<TelemetryConfig>  = {
-  samplingRate: 1.0,
+  samplingRate: 1.0, // 100% trace sampling by default
+  metricExportIntervalMs: 5000, // Export metrics every 5 seconds
   enableUserConsent: false,
   enablePIISanitization: true,
   exporterType: 'otlp-http',
   enableMetrics: true,
   enableTracing: true,
-  enableLogging: false,
-  batchTimeout: 2000,
+  batchTimeout: 2000, // For trace batching
   maxBatchSize: 100,
   dataProcessors: []
 }
 
 export class ConfigValidator {
   static validate(config: TelemetryConfig): void {
-    if (!config.serviceName) throw new Error('serviceName is required')
-    if (!config.serviceVersion) throw new Error('serviceVersion is required')
     if (!config.exporterEndpoint) throw new Error('exporterEndpoint is required')
 
     if (
       config.samplingRate !== undefined &&
       (config.samplingRate < 0 || config.samplingRate > 1)
     ) throw new Error('samplingRate must be between 0 and 1')
+
+    if (
+      config.metricExportIntervalMs !== undefined &&
+      config.metricExportIntervalMs < 1000
+    ) throw new Error('metricExportIntervalMs must be at least 1000ms')
 
     if (config.exporterAuth) this.validateAuthConfig(config.exporterAuth)
   }
