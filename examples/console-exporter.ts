@@ -1,9 +1,9 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js"
+import { z } from "zod"
 
-import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js";
+import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js"
 
 // Create MCP server
 const server = new Server(
@@ -16,7 +16,7 @@ const server = new Server(
       tools: {},
     },
   }
-);
+)
 
 // Configuration for console output (useful for development/testing)
 const telemetryConfig: TelemetryConfig = {
@@ -40,37 +40,37 @@ const telemetryConfig: TelemetryConfig = {
         tool: telemetryData.toolName,
         duration: telemetryData.duration,
         success: !telemetryData.error
-      });
-      return telemetryData;
+      })
+      return telemetryData
     }
   ]
-};
+}
 
 // Initialize telemetry with console output
-const telemetry = initializeAgentObservability(server as any, telemetryConfig);
+const telemetry = initializeAgentObservability(server as any, telemetryConfig)
 
 // Tool handler functions
 async function handleCalculate(operation: string, a: number, b: number) {
-  let result: number;
+  let result: number
 
   switch (operation) {
     case "add":
-      result = a + b;
-      break;
+      result = a + b
+      break
     case "subtract":
-      result = a - b;
-      break;
+      result = a - b
+      break
     case "multiply":
-      result = a * b;
-      break;
+      result = a * b
+      break
     case "divide":
       if (b === 0) {
-        throw new Error("Division by zero is not allowed");
+        throw new Error("Division by zero is not allowed")
       }
-      result = a / b;
-      break;
+      result = a / b
+      break
     default:
-      throw new Error(`Unknown operation: ${operation}`);
+      throw new Error(`Unknown operation: ${operation}`)
   }
 
   return {
@@ -78,27 +78,27 @@ async function handleCalculate(operation: string, a: number, b: number) {
     operands: [a, b],
     result,
     timestamp: new Date().toISOString()
-  };
+  }
 }
 
 async function handleTextTransform(text: string, transformation: string) {
-  let result: string | number;
+  let result: string | number
 
   switch (transformation) {
     case "uppercase":
-      result = text.toUpperCase();
-      break;
+      result = text.toUpperCase()
+      break
     case "lowercase":
-      result = text.toLowerCase();
-      break;
+      result = text.toLowerCase()
+      break
     case "reverse":
-      result = text.split('').reverse().join('');
-      break;
+      result = text.split('').reverse().join('')
+      break
     case "length":
-      result = text.length;
-      break;
+      result = text.length
+      break
     default:
-      throw new Error(`Unknown transformation: ${transformation}`);
+      throw new Error(`Unknown transformation: ${transformation}`)
   }
 
   return {
@@ -106,7 +106,7 @@ async function handleTextTransform(text: string, transformation: string) {
     transformation,
     result,
     timestamp: new Date().toISOString()
-  };
+  }
 }
 
 // Add tool handlers
@@ -156,17 +156,17 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         }
       }
     ]
-  };
-});
+  }
+})
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
+  const { name, arguments: args } = request.params
 
-  console.log(`🔧 Tool called: ${name} with args:`, args);
+  console.log(`🔧 Tool called: ${name} with args:`, args)
 
   switch (name) {
     case "calculate":
-      const result1 = await handleCalculate(args?.operation as string, args?.a as number, args?.b as number);
+      const result1 = await handleCalculate(args?.operation as string, args?.a as number, args?.b as number)
       return {
         content: [
           {
@@ -174,9 +174,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             text: JSON.stringify(result1, null, 2)
           }
         ]
-      };
+      }
     case "text_transform":
-      const result2 = await handleTextTransform(args?.text as string, args?.transformation as string);
+      const result2 = await handleTextTransform(args?.text as string, args?.transformation as string)
       return {
         content: [
           {
@@ -184,27 +184,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             text: JSON.stringify(result2, null, 2)
           }
         ]
-      };
+      }
     default:
-      throw new Error(`Unknown tool: ${name}`);
+      throw new Error(`Unknown tool: ${name}`)
   }
-});
+})
 
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {
-  console.log('🛑 Shutting down telemetry...');
-  await telemetry.shutdown();
-  process.exit(0);
-});
+  console.log('🛑 Shutting down telemetry...')
+  await telemetry.shutdown()
+  process.exit(0)
+})
 
 // Start server
 async function main() {
-  console.log('🚀 Starting console demo server with telemetry...');
-  console.log('📈 Telemetry will be output to console');
-  console.log('🔧 Available tools: calculate, text_transform');
+  console.log('🚀 Starting console demo server with telemetry...')
+  console.log('📈 Telemetry will be output to console')
+  console.log('🔧 Available tools: calculate, text_transform')
 
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  const transport = new StdioServerTransport()
+  await server.connect(transport)
 }
 
-main().catch(console.error);
+main().catch(console.error)

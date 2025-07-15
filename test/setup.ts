@@ -1,41 +1,41 @@
 // Global test setup file
 
 // Mock timers for consistent testing
-jest.useFakeTimers();
+jest.useFakeTimers()
 
 // Global test timeout
-jest.setTimeout(30000);
+jest.setTimeout(30000)
 
 // Mock console methods to reduce noise during tests
-const originalConsoleError = console.error;
-const originalConsoleWarn = console.warn;
-const originalConsoleLog = console.log;
+const originalConsoleError = console.error
+const originalConsoleWarn = console.warn
+const originalConsoleLog = console.log
 
 beforeEach(() => {
   // Reset all mocks before each test
-  jest.clearAllMocks();
+  jest.clearAllMocks()
 
   // Mock console methods to capture output
-  console.error = jest.fn();
-  console.warn = jest.fn();
-  console.log = jest.fn();
-});
+  console.error = jest.fn()
+  console.warn = jest.fn()
+  console.log = jest.fn()
+})
 
 afterEach(() => {
   // Restore console methods
-  console.error = originalConsoleError;
-  console.warn = originalConsoleWarn;
-  console.log = originalConsoleLog;
+  console.error = originalConsoleError
+  console.warn = originalConsoleWarn
+  console.log = originalConsoleLog
 
   // Clear all timers
-  jest.clearAllTimers();
-});
+  jest.clearAllTimers()
+})
 
 // Global error handler for unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason)
   // Don't exit the process during tests
-});
+})
 
 // Mock OpenTelemetry modules globally to prevent real network calls
 jest.mock('@opentelemetry/api', () => ({
@@ -67,41 +67,41 @@ jest.mock('@opentelemetry/api', () => ({
     PRODUCER: 3,
     CONSUMER: 4
   }
-}));
+}))
 
 jest.mock('@opentelemetry/sdk-node', () => ({
   NodeSDK: jest.fn(() => ({
     start: jest.fn(),
     shutdown: jest.fn().mockResolvedValue(undefined)
   }))
-}));
+}))
 
 jest.mock('@opentelemetry/resources', () => ({
   Resource: jest.fn(() => ({}))
-}));
+}))
 
 jest.mock('@opentelemetry/semantic-conventions', () => ({
   SemanticResourceAttributes: {
     SERVICE_NAME: 'service.name',
     SERVICE_VERSION: 'service.version'
   }
-}));
+}))
 
 jest.mock('@opentelemetry/exporter-trace-otlp-http', () => ({
   OTLPTraceExporter: jest.fn()
-}));
+}))
 
 jest.mock('@opentelemetry/exporter-metrics-otlp-http', () => ({
   OTLPMetricExporter: jest.fn()
-}));
+}))
 
 jest.mock('@opentelemetry/sdk-trace-base', () => ({
   ConsoleSpanExporter: jest.fn()
-}));
+}))
 
 jest.mock('@opentelemetry/sdk-metrics', () => ({
   PeriodicExportingMetricReader: jest.fn()
-}));
+}))
 
 // Export test utilities
 export const testUtils = {
@@ -114,21 +114,21 @@ export const testUtils = {
    * Wait for a specific amount of time (works with fake timers)
    */
   waitFor: (ms: number) => {
-    jest.advanceTimersByTime(ms);
-    return new Promise(resolve => setTimeout(resolve, 0));
+    jest.advanceTimersByTime(ms)
+    return new Promise(resolve => setTimeout(resolve, 0))
   },
 
   /**
    * Create a mock function that can be awaited
    */
   createAsyncMock: <T = any>(resolveValue?: T, rejectValue?: any) => {
-    const mock = jest.fn();
+    const mock = jest.fn()
     if (rejectValue) {
-      mock.mockRejectedValue(rejectValue);
+      mock.mockRejectedValue(rejectValue)
     } else {
-      mock.mockResolvedValue(resolveValue);
+      mock.mockResolvedValue(resolveValue)
     }
-    return mock;
+    return mock
   },
 
   /**
@@ -147,4 +147,4 @@ export const testUtils = {
     _resources: new Map(),
     _prompts: new Map()
   })
-};
+}

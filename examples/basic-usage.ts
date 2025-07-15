@@ -1,8 +1,8 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js"
 
-import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js";
+import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js"
 
 // Create MCP server
 const server = new Server(
@@ -15,7 +15,7 @@ const server = new Server(
       tools: {},
     },
   }
-);
+)
 
 // Configure telemetry with comprehensive options
 const telemetryConfig: TelemetryConfig = {
@@ -40,13 +40,13 @@ const telemetryConfig: TelemetryConfig = {
     (telemetryData: any) => {
       if (telemetryData.toolName === "sensitive_operation") {
         if (telemetryData.parameters) {
-          delete telemetryData.parameters.apiKey;
+          delete telemetryData.parameters.apiKey
         }
       }
-      return telemetryData;
+      return telemetryData
     }
   ]
-};
+}
 
 // Add tool handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -67,13 +67,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         }
       }
     ]
-  };
-});
+  }
+})
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
     case "return_a":
-      const a = request.params.arguments?.a as number;
+      const a = request.params.arguments?.a as number
       return {
         content: [
           {
@@ -81,26 +81,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             text: `Returning: ${a}`
           }
         ]
-      };
+      }
     default:
-      throw new Error(`Unknown tool: ${request.params.name}`);
+      throw new Error(`Unknown tool: ${request.params.name}`)
   }
-});
+})
 
 // Initialize telemetry
-const telemetry = initializeAgentObservability(server as any, telemetryConfig);
+const telemetry = initializeAgentObservability(server as any, telemetryConfig)
 
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {
-  await telemetry.shutdown();
-  process.exit(0);
-});
+  await telemetry.shutdown()
+  process.exit(0)
+})
 
 // Start server
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  const transport = new StdioServerTransport()
+  await server.connect(transport)
   // MCP servers should not log to stdout as it interferes with JSON communication
 }
 
-main().catch(console.error);
+main().catch(console.error)

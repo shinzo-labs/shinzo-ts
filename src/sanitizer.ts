@@ -1,11 +1,11 @@
-import { TelemetryData } from './types';
+import { TelemetryData } from './types'
 
 export class PIISanitizer {
-  private readonly piiPatterns: RegExp[];
-  private readonly enabled: boolean;
+  private readonly piiPatterns: RegExp[]
+  private readonly enabled: boolean
 
   constructor(enabled: boolean = true) {
-    this.enabled = enabled;
+    this.enabled = enabled
     this.piiPatterns = [
       /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g, // Credit card numbers
       /\b\d{3}-\d{2}-\d{4}\b/g, // SSN
@@ -14,24 +14,24 @@ export class PIISanitizer {
       /\b(?:api[_-]?key|secret|token|password|passwd|pwd)\s*[:=]\s*["']?([^"'\s]+)/gi, // API keys and secrets
       /\b[A-Za-z0-9]{20,}\b/g, // Long tokens/keys
       /\b(?:Bearer|Basic)\s+[A-Za-z0-9+/=]+/gi, // Auth headers
-    ];
+    ]
   }
 
   public sanitize(data: TelemetryData): TelemetryData {
     if (!this.enabled) {
-      return data;
+      return data
     }
 
-    const sanitizedData = { ...data };
+    const sanitizedData = { ...data }
 
     // Sanitize parameters
     if (sanitizedData.parameters) {
-      sanitizedData.parameters = this.sanitizeObject(sanitizedData.parameters);
+      sanitizedData.parameters = this.sanitizeObject(sanitizedData.parameters)
     }
 
     // Sanitize result
     if (sanitizedData.result) {
-      sanitizedData.result = this.sanitizeValue(sanitizedData.result);
+      sanitizedData.result = this.sanitizeValue(sanitizedData.result)
     }
 
     // Sanitize error messages
@@ -40,48 +40,48 @@ export class PIISanitizer {
         ...sanitizedData.error,
         message: this.sanitizeString(sanitizedData.error.message),
         stack: sanitizedData.error.stack ? this.sanitizeString(sanitizedData.error.stack) : undefined
-      };
+      }
     }
 
-    return sanitizedData;
+    return sanitizedData
   }
 
   private sanitizeObject(obj: Record<string, any>): Record<string, any> {
-    const sanitized: Record<string, any> = {};
+    const sanitized: Record<string, any> = {}
 
     for (const [key, value] of Object.entries(obj)) {
       // Check if key name suggests sensitive data
       if (this.isSensitiveKey(key)) {
-        sanitized[key] = '[REDACTED]';
+        sanitized[key] = '[REDACTED]'
       } else {
-        sanitized[key] = this.sanitizeValue(value);
+        sanitized[key] = this.sanitizeValue(value)
       }
     }
 
-    return sanitized;
+    return sanitized
   }
 
   private sanitizeValue(value: any): any {
     if (typeof value === 'string') {
-      return this.sanitizeString(value);
+      return this.sanitizeString(value)
     } else if (typeof value === 'object' && value !== null) {
       if (Array.isArray(value)) {
-        return value.map(item => this.sanitizeValue(item));
+        return value.map(item => this.sanitizeValue(item))
       } else {
-        return this.sanitizeObject(value);
+        return this.sanitizeObject(value)
       }
     }
-    return value;
+    return value
   }
 
   private sanitizeString(str: string): string {
-    let sanitized = str;
+    let sanitized = str
 
     for (const pattern of this.piiPatterns) {
-      sanitized = sanitized.replace(pattern, '[REDACTED]');
+      sanitized = sanitized.replace(pattern, '[REDACTED]')
     }
 
-    return sanitized;
+    return sanitized
   }
 
   private isSensitiveKey(key: string): boolean {
@@ -89,10 +89,10 @@ export class PIISanitizer {
       'password', 'passwd', 'pwd', 'secret', 'token', 'key', 'auth', 'authorization',
       'apikey', 'api_key', 'access_token', 'refresh_token', 'bearer', 'credential',
       'ssn', 'social_security', 'credit_card', 'cc_number', 'cvv', 'pin'
-    ];
+    ]
 
     return sensitiveKeys.some(sensitiveKey => 
       key.toLowerCase().includes(sensitiveKey)
-    );
+    )
   }
 }

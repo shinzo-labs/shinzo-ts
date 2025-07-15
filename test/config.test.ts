@@ -1,5 +1,5 @@
-import { ConfigValidator, createDefaultConfig, mergeConfigs } from '../src/config';
-import { TelemetryConfig } from '../src/types';
+import { ConfigValidator, createDefaultConfig, mergeConfigs } from '../src/config'
+import { TelemetryConfig } from '../src/types'
 
 describe('ConfigValidator', () => {
   describe('validate', () => {
@@ -8,37 +8,37 @@ describe('ConfigValidator', () => {
         serviceName: 'test-service',
         serviceVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318'
-      };
+      }
 
-      expect(() => ConfigValidator.validate(config)).not.toThrow();
-    });
+      expect(() => ConfigValidator.validate(config)).not.toThrow()
+    })
 
     it('should throw error when serviceName is missing', () => {
       const config = {
         serviceVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318'
-      } as TelemetryConfig;
+      } as TelemetryConfig
 
-      expect(() => ConfigValidator.validate(config)).toThrow('serviceName is required');
-    });
+      expect(() => ConfigValidator.validate(config)).toThrow('serviceName is required')
+    })
 
     it('should throw error when serviceVersion is missing', () => {
       const config = {
         serviceName: 'test-service',
         exporterEndpoint: 'http://localhost:4318'
-      } as TelemetryConfig;
+      } as TelemetryConfig
 
-      expect(() => ConfigValidator.validate(config)).toThrow('serviceVersion is required');
-    });
+      expect(() => ConfigValidator.validate(config)).toThrow('serviceVersion is required')
+    })
 
     it('should throw error when exporterEndpoint is missing', () => {
       const config = {
         serviceName: 'test-service',
         serviceVersion: '1.0.0'
-      } as TelemetryConfig;
+      } as TelemetryConfig
 
-      expect(() => ConfigValidator.validate(config)).toThrow('exporterEndpoint is required');
-    });
+      expect(() => ConfigValidator.validate(config)).toThrow('exporterEndpoint is required')
+    })
 
     it('should throw error when samplingRate is invalid', () => {
       const config: TelemetryConfig = {
@@ -46,10 +46,10 @@ describe('ConfigValidator', () => {
         serviceVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318',
         samplingRate: 1.5
-      };
+      }
 
-      expect(() => ConfigValidator.validate(config)).toThrow('samplingRate must be between 0 and 1');
-    });
+      expect(() => ConfigValidator.validate(config)).toThrow('samplingRate must be between 0 and 1')
+    })
 
     it('should validate bearer auth correctly', () => {
       const config: TelemetryConfig = {
@@ -60,10 +60,10 @@ describe('ConfigValidator', () => {
           type: 'bearer',
           token: 'test-token'
         }
-      };
+      }
 
-      expect(() => ConfigValidator.validate(config)).not.toThrow();
-    });
+      expect(() => ConfigValidator.validate(config)).not.toThrow()
+    })
 
     it('should throw error when bearer token is missing', () => {
       const config: TelemetryConfig = {
@@ -73,10 +73,10 @@ describe('ConfigValidator', () => {
         exporterAuth: {
           type: 'bearer'
         }
-      };
+      }
 
-      expect(() => ConfigValidator.validate(config)).toThrow('Bearer token is required when using bearer auth');
-    });
+      expect(() => ConfigValidator.validate(config)).toThrow('Bearer token is required when using bearer auth')
+    })
 
     it('should validate apiKey auth correctly', () => {
       const config: TelemetryConfig = {
@@ -87,10 +87,10 @@ describe('ConfigValidator', () => {
           type: 'apiKey',
           apiKey: 'test-key'
         }
-      };
+      }
 
-      expect(() => ConfigValidator.validate(config)).not.toThrow();
-    });
+      expect(() => ConfigValidator.validate(config)).not.toThrow()
+    })
 
     it('should validate basic auth correctly', () => {
       const config: TelemetryConfig = {
@@ -102,16 +102,16 @@ describe('ConfigValidator', () => {
           username: 'user',
           password: 'pass'
         }
-      };
+      }
 
-      expect(() => ConfigValidator.validate(config)).not.toThrow();
-    });
-  });
-});
+      expect(() => ConfigValidator.validate(config)).not.toThrow()
+    })
+  })
+})
 
 describe('createDefaultConfig', () => {
   it('should create default config with expected values', () => {
-    const defaultConfig = createDefaultConfig();
+    const defaultConfig = createDefaultConfig()
 
     expect(defaultConfig).toEqual({
       samplingRate: 1.0,
@@ -125,9 +125,9 @@ describe('createDefaultConfig', () => {
       maxBatchSize: 100,
       customAttributes: {},
       dataProcessors: []
-    });
-  });
-});
+    })
+  })
+})
 
 describe('mergeConfigs', () => {
   it('should merge configs correctly', () => {
@@ -136,7 +136,7 @@ describe('mergeConfigs', () => {
       enableTracing: true,
       customAttributes: { default: 'value' },
       dataProcessors: [jest.fn()]
-    };
+    }
 
     const userConfig: TelemetryConfig = {
       serviceName: 'test-service',
@@ -145,16 +145,16 @@ describe('mergeConfigs', () => {
       samplingRate: 0.5,
       customAttributes: { user: 'value' },
       dataProcessors: [jest.fn()]
-    };
+    }
 
-    const merged = mergeConfigs(defaultConfig, userConfig);
+    const merged = mergeConfigs(defaultConfig, userConfig)
 
-    expect(merged.samplingRate).toBe(0.5);
-    expect(merged.enableTracing).toBe(true);
+    expect(merged.samplingRate).toBe(0.5)
+    expect(merged.enableTracing).toBe(true)
     expect(merged.customAttributes).toEqual({
       default: 'value',
       user: 'value'
-    });
-    expect(merged.dataProcessors).toHaveLength(2);
-  });
-});
+    })
+    expect(merged.dataProcessors).toHaveLength(2)
+  })
+})

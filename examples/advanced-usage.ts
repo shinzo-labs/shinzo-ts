@@ -1,9 +1,9 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js"
+import { z } from "zod"
 
-import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js";
+import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js"
 
 // Create MCP server
 const server = new Server(
@@ -18,7 +18,7 @@ const server = new Server(
       prompts: {},
     },
   }
-);
+)
 
 // Advanced telemetry configuration
 const telemetryConfig: TelemetryConfig = {
@@ -52,54 +52,54 @@ const telemetryConfig: TelemetryConfig = {
           // Sanitize SQL queries
           telemetryData.parameters.query = telemetryData.parameters.query
             .replace(/password\s*=\s*['"][^'"]*['"]/gi, "password='[REDACTED]'")
-            .replace(/api_key\s*=\s*['"][^'"]*['"]/gi, "api_key='[REDACTED]'");
+            .replace(/api_key\s*=\s*['"][^'"]*['"]/gi, "api_key='[REDACTED]'")
         }
       }
-      return telemetryData;
+      return telemetryData
     },
     // Add performance categorization
     (telemetryData: any) => {
       if (telemetryData.duration !== undefined) {
-        telemetryData.attributes = telemetryData.attributes || {};
+        telemetryData.attributes = telemetryData.attributes || {}
         if (telemetryData.duration > 5000) {
-          telemetryData.attributes.performance_category = "slow";
+          telemetryData.attributes.performance_category = "slow"
         } else if (telemetryData.duration > 1000) {
-          telemetryData.attributes.performance_category = "medium";
+          telemetryData.attributes.performance_category = "medium"
         } else {
-          telemetryData.attributes.performance_category = "fast";
+          telemetryData.attributes.performance_category = "fast"
         }
       }
-      return telemetryData;
+      return telemetryData
     }
   ]
-};
+}
 
 // Initialize telemetry
-const telemetry = initializeAgentObservability(server as any, telemetryConfig);
+const telemetry = initializeAgentObservability(server as any, telemetryConfig)
 
 // Add custom attributes dynamically
-telemetry.addCustomAttribute("server_start_time", Date.now());
-telemetry.addCustomAttribute("process_id", process.pid);
+telemetry.addCustomAttribute("server_start_time", Date.now())
+telemetry.addCustomAttribute("process_id", process.pid)
 
 // Tool handler functions
 async function handleDatabaseQuery(query: string, params?: any[]) {
   // Simulate database operation
-  const startTime = Date.now();
+  const startTime = Date.now()
 
   // Create custom span for database operation
   const dbSpan = telemetry.createSpan("database.query", {
     "db.statement": query,
     "db.operation": query.split(' ')[0].toUpperCase()
-  });
+  })
 
   try {
     // Simulate query execution time
-    await new Promise(resolve => setTimeout(resolve, Math.random() * 2000));
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 2000))
 
     // Record custom metric
     telemetry.recordMetric("database.query.duration", Date.now() - startTime, {
       "db.operation": query.split(' ')[0].toUpperCase()
-    });
+    })
 
     const result = {
       rows: [
@@ -108,14 +108,14 @@ async function handleDatabaseQuery(query: string, params?: any[]) {
       ],
       rowCount: 2,
       executionTime: Date.now() - startTime
-    };
+    }
 
-    dbSpan.end();
-    return result;
+    dbSpan.end()
+    return result
   } catch (error) {
-    dbSpan.recordException(error as Error);
-    dbSpan.end();
-    throw error;
+    dbSpan.recordException(error as Error)
+    dbSpan.end()
+    throw error
   }
 }
 
@@ -124,30 +124,30 @@ async function handleProcessFile(filename: string, content: string) {
   const processingSpan = telemetry.createSpan("file.process", {
     "file.name": filename,
     "file.size": content.length
-  });
+  })
 
   try {
     // Simulate processing time based on content length
-    const processingTime = Math.min(content.length / 100, 3000);
-    await new Promise(resolve => setTimeout(resolve, processingTime));
+    const processingTime = Math.min(content.length / 100, 3000)
+    await new Promise(resolve => setTimeout(resolve, processingTime))
 
     const result = {
       filename,
       processedLines: content.split('\n').length,
       processedCharacters: content.length,
       processingTime
-    };
+    }
 
     telemetry.recordMetric("file.processing.duration", processingTime, {
       "file.type": filename.split('.').pop() || "unknown"
-    });
+    })
 
-    processingSpan.end();
-    return result;
+    processingSpan.end()
+    return result
   } catch (error) {
-    processingSpan.recordException(error as Error);
-    processingSpan.end();
-    throw error;
+    processingSpan.recordException(error as Error)
+    processingSpan.end()
+    throw error
   }
 }
 
@@ -155,17 +155,17 @@ async function handleErrorTest(shouldError: boolean, errorType: string = "intern
   if (shouldError) {
     switch (errorType) {
       case "validation":
-        throw new Error("Validation failed: Invalid input parameters");
+        throw new Error("Validation failed: Invalid input parameters")
       case "network":
-        throw new Error("Network error: Unable to connect to external service");
+        throw new Error("Network error: Unable to connect to external service")
       case "internal":
-        throw new Error("Internal error: Something went wrong");
+        throw new Error("Internal error: Something went wrong")
       default:
-        throw new Error("Unknown error occurred");
+        throw new Error("Unknown error occurred")
     }
   }
 
-  return { success: true, message: "Operation completed successfully" };
+  return { success: true, message: "Operation completed successfully" }
 }
 
 // Add tool handlers
@@ -229,15 +229,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         }
       }
     ]
-  };
-});
+  }
+})
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
+  const { name, arguments: args } = request.params
 
   switch (name) {
     case "database_query":
-      const result1 = await handleDatabaseQuery(args?.query as string, args?.params as any[]);
+      const result1 = await handleDatabaseQuery(args?.query as string, args?.params as any[])
       return {
         content: [
           {
@@ -245,9 +245,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             text: JSON.stringify(result1, null, 2)
           }
         ]
-      };
+      }
     case "process_file":
-      const result2 = await handleProcessFile(args?.filename as string, args?.content as string);
+      const result2 = await handleProcessFile(args?.filename as string, args?.content as string)
       return {
         content: [
           {
@@ -255,9 +255,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             text: JSON.stringify(result2, null, 2)
           }
         ]
-      };
+      }
     case "error_test":
-      const result3 = await handleErrorTest(args?.shouldError as boolean, args?.errorType as string);
+      const result3 = await handleErrorTest(args?.shouldError as boolean, args?.errorType as string)
       return {
         content: [
           {
@@ -265,28 +265,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             text: JSON.stringify(result3, null, 2)
           }
         ]
-      };
+      }
     default:
-      throw new Error(`Unknown tool: ${name}`);
+      throw new Error(`Unknown tool: ${name}`)
   }
-});
+})
 
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {
-  await telemetry.shutdown();
-  process.exit(0);
-});
+  await telemetry.shutdown()
+  process.exit(0)
+})
 
 process.on('SIGTERM', async () => {
-  await telemetry.shutdown();
-  process.exit(0);
-});
+  await telemetry.shutdown()
+  process.exit(0)
+})
 
 // Start server
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  const transport = new StdioServerTransport()
+  await server.connect(transport)
   // MCP servers should not log to stdout as it interferes with JSON communication
 }
 
-main().catch(console.error);
+main().catch(console.error)

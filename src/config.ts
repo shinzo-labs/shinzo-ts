@@ -1,23 +1,23 @@
-import { TelemetryConfig, AuthConfig } from './types';
+import { TelemetryConfig, AuthConfig } from './types'
 
 export class ConfigValidator {
   static validate(config: TelemetryConfig): void {
     if (!config.serviceName) {
-      throw new Error('serviceName is required');
+      throw new Error('serviceName is required')
     }
     if (!config.serviceVersion) {
-      throw new Error('serviceVersion is required');
+      throw new Error('serviceVersion is required')
     }
     if (!config.exporterEndpoint) {
-      throw new Error('exporterEndpoint is required');
+      throw new Error('exporterEndpoint is required')
     }
 
     if (config.samplingRate !== undefined && (config.samplingRate < 0 || config.samplingRate > 1)) {
-      throw new Error('samplingRate must be between 0 and 1');
+      throw new Error('samplingRate must be between 0 and 1')
     }
 
     if (config.exporterAuth) {
-      this.validateAuthConfig(config.exporterAuth);
+      this.validateAuthConfig(config.exporterAuth)
     }
   }
 
@@ -25,19 +25,19 @@ export class ConfigValidator {
     switch (auth.type) {
       case 'bearer':
         if (!auth.token) {
-          throw new Error('Bearer token is required when using bearer auth');
+          throw new Error('Bearer token is required when using bearer auth')
         }
-        break;
+        break
       case 'apiKey':
         if (!auth.apiKey) {
-          throw new Error('API key is required when using apiKey auth');
+          throw new Error('API key is required when using apiKey auth')
         }
-        break;
+        break
       case 'basic':
         if (!auth.username || !auth.password) {
-          throw new Error('Username and password are required when using basic auth');
+          throw new Error('Username and password are required when using basic auth')
         }
-        break;
+        break
     }
   }
 }
@@ -55,7 +55,7 @@ export function createDefaultConfig(): Partial<TelemetryConfig> {
     maxBatchSize: 100,
     customAttributes: {},
     dataProcessors: []
-  };
+  }
 }
 
 export function mergeConfigs(defaultConfig: Partial<TelemetryConfig>, userConfig: TelemetryConfig): TelemetryConfig {
@@ -70,5 +70,5 @@ export function mergeConfigs(defaultConfig: Partial<TelemetryConfig>, userConfig
       ...(defaultConfig.dataProcessors || []),
       ...(userConfig.dataProcessors || [])
     ]
-  };
+  }
 }

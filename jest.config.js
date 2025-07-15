@@ -32,4 +32,4 @@ module.exports = {
   maxWorkers: '50%',
   detectOpenHandles: true,
   forceExit: true,
-};
+}
