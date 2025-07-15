@@ -1,10 +1,12 @@
 import { TelemetryManager } from './telemetry';
 import { McpServerInstrumentation } from './instrumentation';
 import { ConfigValidator } from './config';
-import { TelemetryConfig, McpServerLike, ObservabilityInstance } from './types';
+import { TelemetryConfig, ObservabilityInstance } from './types';
+
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 
 export function initializeAgentObservability(
-  server: McpServerLike,
+  server: McpServer,
   config: TelemetryConfig
 ): ObservabilityInstance {
   ConfigValidator.validate(config);
@@ -44,7 +46,6 @@ export { ConfigValidator } from './config';
 export type {
   AuthConfig,
   DataProcessor,
-  McpServerLike,
   ObservabilityInstance,
   TelemetryConfig,
   TelemetryData

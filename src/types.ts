@@ -9,15 +9,15 @@ export interface TelemetryConfig {
     username?: string
     password?: string
   }
-  samplingRate?: number // For trace sampling (0.0 to 1.0)
-  metricExportIntervalMs?: number // How often to export metrics (default: 5000ms)
+  samplingRate?: number
+  metricExportIntervalMs?: number
   enableUserConsent?: boolean
   enablePIISanitization?: boolean
   dataProcessors?: DataProcessor[]
   exporterType?: 'otlp-http' | 'otlp-grpc' | 'console'
   enableMetrics?: boolean
   enableTracing?: boolean
-  batchTimeout?: number // For trace batching
+  batchTimeout?: number
   maxBatchSize?: number
 }
 
@@ -45,20 +45,6 @@ export interface AuthConfig {
   apiKey?: string
   username?: string
   password?: string
-}
-
-export interface McpServerLike {
-  name: string
-  version: string
-  _tools?: Map<string, any>
-  _resources?: Map<string, any>
-  _prompts?: Map<string, any>
-  on?: (event: string, listener: Function) => void
-  off?: (event: string, listener: Function) => void
-  emit?: (event: string, ...args: any[]) => void
-  tool?: (name: string, description: string, inputSchema: any, handler: Function) => any
-  resource?: (uri: string, handler: Function) => any
-  prompt?: (name: string, description: string, handler: Function) => any
 }
 
 export interface ObservabilityInstance {

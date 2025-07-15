@@ -1,15 +1,16 @@
 import { TelemetryManager } from './telemetry'
-import { TelemetryData, McpServerLike } from './types'
+import { TelemetryData } from './types'
 import { SpanStatusCode } from '@opentelemetry/api'
 import { generateUuid } from './utils'
+import { McpServer, RegisteredTool } from '@modelcontextprotocol/sdk/server/mcp'
 
 export class McpServerInstrumentation {
   private telemetryManager: TelemetryManager
-  private server: McpServerLike
+  private server: McpServer
   private originalMethods: Map<string, Function> = new Map()
   private isInstrumented: boolean = false
 
-  constructor(server: McpServerLike, telemetryManager: TelemetryManager) {
+  constructor(server: McpServer, telemetryManager: TelemetryManager) {
     this.server = server
     this.telemetryManager = telemetryManager
   }
@@ -24,36 +25,34 @@ export class McpServerInstrumentation {
   }
 
   private instrumentToolCalls(): void {
-    const originalAddTool = this.server.tool?.bind(this.server)
-    if (originalAddTool) {
-      this.server.tool = (name: string, description: string, inputSchema: any, handler: Function) => {
-        const instrumentedHandler = this.createInstrumentedHandler(handler, 'tool', name)
-        return originalAddTool(name, description, inputSchema, instrumentedHandler)
+    const originalTool = this.server.tool.bind(this.server)
+
+    // TODO add instrumentation for the tool method
+
+    this.server.tool = (name: string, ...rest: unknown[]): RegisteredTool => {
+      const cb = rest[rest.length - 1] as Function
+      if (typeof cb === 'function') {
+        rest[rest.length - 1] = this.createInstrumentedHandler(cb, 'tools/call', name)
       }
+      return originalTool(name, ...rest)
     }
   }
 
   private instrumentResourceReads(): void {
-    const originalAddResource = this.server.resource?.bind(this.server)
-    if (originalAddResource) {
-      this.server.resource = (uri: string, handler: Function) => {
-        const instrumentedHandler = this.createInstrumentedHandler(handler, 'resource', uri)
-        return originalAddResource(uri, instrumentedHandler)
-      }
-    }
+    // TODO add instrumentation for the resource method
   }
 
   private instrumentPromptCalls(): void {
-    const originalAddPrompt = this.server.prompt?.bind(this.server)
-    if (originalAddPrompt) {
-      this.server.prompt = (name: string, description: string, handler: Function) => {
-        const instrumentedHandler = this.createInstrumentedHandler(handler, 'prompt', name)
-        return originalAddPrompt(name, description, instrumentedHandler)
-      }
-    }
+    // TODO add instrumentation for the prompt method
   }
 
-  private createInstrumentedHandler(originalHandler: Function, type: 'tool' | 'resource' | 'prompt', name: string): Function {
+  private instrumentNotification(): void {
+    // TODO add instrumentation for the notification method
+  }
+
+  private instrumentedTool
+
+  private createInstrumentedHandler(originalHandler: Function, method: string, name: string): Function {
     return async (...args: any[]) => {
       const startTime = Date.now()
       const requestId = generateUuid()
@@ -98,7 +97,6 @@ export class McpServerInstrumentation {
         })
 
         const processedData = this.telemetryManager.processTelemetryData(telemetryData)
-        this.emitTelemetryEvent(processedData)
 
         return result
       } catch (error) {
@@ -126,7 +124,6 @@ export class McpServerInstrumentation {
         })
 
         const processedData = this.telemetryManager.processTelemetryData(telemetryData)
-        this.emitTelemetryEvent(processedData)
 
         throw error
       } finally {
@@ -148,10 +145,6 @@ export class McpServerInstrumentation {
       params[`arg${index}`] = arg
       return params
     }, {})
-  }
-
-  private emitTelemetryEvent(data: TelemetryData): void {
-    if (this.server.emit) this.server.emit('telemetry', data)
   }
 
   public uninstrument(): void {

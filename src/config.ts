@@ -2,13 +2,13 @@ import { TelemetryConfig, AuthConfig } from './types'
 
 export const DEFAULT_CONFIG: Partial<TelemetryConfig>  = {
   samplingRate: 1.0, // 100% trace sampling by default
-  metricExportIntervalMs: 5000, // Export metrics every 5 seconds
+  metricExportIntervalMs: 5000, // ms
   enableUserConsent: false,
   enablePIISanitization: true,
   exporterType: 'otlp-http',
   enableMetrics: true,
   enableTracing: true,
-  batchTimeout: 2000, // For trace batching
+  batchTimeout: 2000, // ms
   maxBatchSize: 100,
   dataProcessors: []
 }

@@ -7,10 +7,11 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http'
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base'
-import { McpServerLike, TelemetryConfig, TelemetryData, ObservabilityInstance } from './types'
+import { TelemetryConfig, TelemetryData, ObservabilityInstance } from './types'
 import { DEFAULT_CONFIG } from './config'
 import { PIISanitizer } from './sanitizer'
 import { generateUuid } from './utils'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 
 export class TelemetryManager implements ObservabilityInstance {
   private sdk: NodeSDK | undefined
@@ -20,18 +21,20 @@ export class TelemetryManager implements ObservabilityInstance {
   private piiSanitizer: PIISanitizer
   private sessionId: string
   private isInitialized: boolean = false
+  private serverInfo: { name: string, version: string }
 
-  constructor(server: McpServerLike, config: TelemetryConfig) {
+  constructor(server: McpServer, config: TelemetryConfig) {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = generateUuid()
     this.piiSanitizer = new PIISanitizer(this.config.enablePIISanitization || false)
     this.initializeSDK(server)
+    this.serverInfo = { name: "Shinzo Test Server", version: "1.0.0" }
   }
 
-  private initializeSDK(server: McpServerLike): void {
+  private initializeSDK(server: McpServer): void {
     const resource = new Resource({
-      [ATTR_SERVICE_NAME]: server.name,
-      [ATTR_SERVICE_VERSION]: server.version,
+      [ATTR_SERVICE_NAME]: this.serverInfo.name,
+      [ATTR_SERVICE_VERSION]: this.serverInfo.version,
       'mcp.session.id': this.sessionId,
     })
 
@@ -43,7 +46,6 @@ export class TelemetryManager implements ObservabilityInstance {
       traceExporter: this.config.enableTracing ? traceExporter : undefined,
     }
 
-    // Configure trace sampling
     if (this.config.enableTracing && this.config.samplingRate !== undefined) {
       sdkConfig.sampler = new TraceIdRatioBasedSampler(this.config.samplingRate || DEFAULT_CONFIG.samplingRate)
     }
@@ -57,8 +59,8 @@ export class TelemetryManager implements ObservabilityInstance {
     this.sdk.start()
     this.isInitialized = true
 
-    this.tracer = trace.getTracer(server.name, server.version)
-    this.meter = metrics.getMeter(server.name, server.version)
+    this.tracer = trace.getTracer(this.serverInfo.name, this.serverInfo.version)
+    this.meter = metrics.getMeter(this.serverInfo.name, this.serverInfo.version)
   }
 
   private createTraceExporter() {
@@ -139,7 +141,6 @@ export class TelemetryManager implements ObservabilityInstance {
         ...attributes
       })
     } catch (error) {
-      // Gracefully handle metric recording errors
       console.warn('Failed to record metric:', error)
     }
   }
@@ -180,7 +181,6 @@ export class TelemetryManager implements ObservabilityInstance {
     }
   }
 
-  // Expose the tracer and meter for advanced usage
   public getTracer() {
     return this.tracer
   }
