@@ -14,9 +14,7 @@ export class McpServerInstrumentation {
   }
 
   public instrument(): void {
-    if (this.isInstrumented) {
-      return
-    }
+    if (this.isInstrumented) return
 
     this.instrumentToolCalls()
     this.instrumentResourceReads()
@@ -62,8 +60,7 @@ export class McpServerInstrumentation {
       const startTime = Date.now()
       const requestId = this.generateRequestId()
 
-      const spanName = this.createSpanName(type, name)
-      const span = this.telemetryManager.createSpan(spanName, {
+      const span = this.telemetryManager.createSpan(`${type}s/call ${name}`, {
         'mcp.method.name': `${type}s/call`,
         [`mcp.${type}.name`]: name,
         'mcp.request.id': requestId
@@ -138,10 +135,6 @@ export class McpServerInstrumentation {
         span.end()
       }
     }
-  }
-
-  private createSpanName(type: string, name: string): string {
-    return `${type}s/call ${name}`
   }
 
   private extractParameters(args: any[]): Record<string, any> {

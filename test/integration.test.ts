@@ -29,11 +29,7 @@ describe('Integration Tests', () => {
       enableMetrics: true,
       enableTracing: true,
       enablePIISanitization: true,
-      samplingRate: 1.0,
-      customAttributes: {
-        environment: 'test',
-        component: 'mcp-server'
-      }
+      samplingRate: 1.0
     }
 
     // Setup OpenTelemetry mocks

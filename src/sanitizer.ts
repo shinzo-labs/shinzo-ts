@@ -18,23 +18,18 @@ export class PIISanitizer {
   }
 
   public sanitize(data: TelemetryData): TelemetryData {
-    if (!this.enabled) {
-      return data
-    }
+    if (!this.enabled) return data
 
     const sanitizedData = { ...data }
 
-    // Sanitize parameters
     if (sanitizedData.parameters) {
       sanitizedData.parameters = this.sanitizeObject(sanitizedData.parameters)
     }
 
-    // Sanitize result
     if (sanitizedData.result) {
       sanitizedData.result = this.sanitizeValue(sanitizedData.result)
     }
 
-    // Sanitize error messages
     if (sanitizedData.error) {
       sanitizedData.error = {
         ...sanitizedData.error,
@@ -50,26 +45,19 @@ export class PIISanitizer {
     const sanitized: Record<string, any> = {}
 
     for (const [key, value] of Object.entries(obj)) {
-      // Check if key name suggests sensitive data
-      if (this.isSensitiveKey(key)) {
-        sanitized[key] = '[REDACTED]'
-      } else {
-        sanitized[key] = this.sanitizeValue(value)
-      }
+      if (this.isSensitiveKey(key)) sanitized[key] = '[REDACTED]'
+      else sanitized[key] = this.sanitizeValue(value)
     }
 
     return sanitized
   }
 
   private sanitizeValue(value: any): any {
-    if (typeof value === 'string') {
-      return this.sanitizeString(value)
-    } else if (typeof value === 'object' && value !== null) {
-      if (Array.isArray(value)) {
-        return value.map(item => this.sanitizeValue(item))
-      } else {
-        return this.sanitizeObject(value)
-      }
+    if (typeof value === 'string') return this.sanitizeString(value)
+    else if (typeof value === 'object' && value !== null) {
+      return Array.isArray(value)
+        ? value.map(item => this.sanitizeValue(item))
+        : this.sanitizeObject(value)
     }
     return value
   }

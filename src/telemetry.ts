@@ -7,7 +7,7 @@ import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http'
 import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base'
 import { trace, metrics, SpanKind } from '@opentelemetry/api'
 import { TelemetryConfig, TelemetryData, ObservabilityInstance } from './types'
-import { createDefaultConfig, mergeConfigs } from './config'
+import { DEFAULT_CONFIG } from './config'
 import { PIISanitizer } from './sanitizer'
 
 export class TelemetryManager implements ObservabilityInstance {
@@ -20,7 +20,7 @@ export class TelemetryManager implements ObservabilityInstance {
   private isInitialized: boolean = false
 
   constructor(config: TelemetryConfig) {
-    this.config = mergeConfigs(createDefaultConfig(), config)
+    this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = this.generateSessionId()
     this.piiSanitizer = new PIISanitizer(this.config.enablePIISanitization || false)
     this.initializeSDK()
@@ -30,8 +30,7 @@ export class TelemetryManager implements ObservabilityInstance {
     const resource = new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: this.config.serviceName,
       [SemanticResourceAttributes.SERVICE_VERSION]: this.config.serviceVersion,
-      'mcp.session.id': this.sessionId,
-      ...this.config.customAttributes
+      'mcp.session.id': this.sessionId
     })
 
     const traceExporter = this.createTraceExporter()
@@ -143,11 +142,6 @@ export class TelemetryManager implements ObservabilityInstance {
       'mcp.session.id': this.sessionId,
       ...attributes
     })
-  }
-
-  public addCustomAttribute(key: string, value: string | number | boolean): void {
-    this.config.customAttributes = this.config.customAttributes || {}
-    this.config.customAttributes[key] = value
   }
 
   public processTelemetryData(data: TelemetryData): TelemetryData {

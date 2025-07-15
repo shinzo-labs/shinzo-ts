@@ -12,7 +12,6 @@ export interface TelemetryConfig {
   samplingRate?: number
   enableUserConsent?: boolean
   enablePIISanitization?: boolean
-  customAttributes?: Record<string, string | number | boolean>
   dataProcessors?: DataProcessor[]
   exporterType?: 'otlp-http' | 'otlp-grpc' | 'console'
   enableMetrics?: boolean
@@ -64,4 +63,6 @@ export interface McpServerLike {
 
 export interface ObservabilityInstance {
   shutdown(): Promise<void>
+  createSpan(name: string, attributes?: Record<string, any>): any
+  recordMetric(name: string, value: number, attributes?: Record<string, any>): void
 }

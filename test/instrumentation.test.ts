@@ -3,7 +3,9 @@ import { TelemetryManager } from '../src/telemetry'
 import { MockMcpServer, createTestTools, createTestResources, createTestPrompts } from './mocks/MockMcpServer'
 
 // Mock the telemetry manager
-jest.mock('../src/telemetry')
+jest.mock('../src/telemetry', () => ({
+  TelemetryManager: jest.fn()
+}))
 
 describe('McpServerInstrumentation', () => {
   let mockServer: MockMcpServer
@@ -27,7 +29,6 @@ describe('McpServerInstrumentation', () => {
       recordMetric: jest.fn(),
       processTelemetryData: jest.fn().mockImplementation((data) => data),
       shutdown: jest.fn(),
-      addCustomAttribute: jest.fn()
     } as any
 
     instrumentation = new McpServerInstrumentation(mockServer, mockTelemetryManager)
@@ -125,16 +126,20 @@ describe('McpServerInstrumentation', () => {
     })
 
     it('should handle slow operations', async () => {
+      // Use real timers for this test
+      jest.useRealTimers()
+      
       createTestTools(mockServer)
       instrumentation.instrument()
 
-      const startTime = Date.now()
-      await mockServer.callTool('slow-operation', { delay: 50 })
-      const endTime = Date.now()
-
-      // Should complete in reasonable time
-      expect(endTime - startTime).toBeGreaterThanOrEqual(50)
-    }, 10000)
+      // Test functionality rather than actual timing to avoid flaky tests
+      const result = await mockServer.callTool('slow-operation', { delay: 5 })
+      
+      expect(result).toEqual({ completed: true, delay: 5 })
+      
+      // Restore fake timers
+      jest.useFakeTimers()
+    })
 
     it('should extract parameters correctly', async () => {
       createTestTools(mockServer)

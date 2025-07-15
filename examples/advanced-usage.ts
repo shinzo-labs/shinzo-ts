@@ -38,12 +38,6 @@ const telemetryConfig: TelemetryConfig = {
   enableLogging: false,
   batchTimeout: 5000,
   maxBatchSize: 50,
-  customAttributes: {
-    environment: process.env.NODE_ENV || "development",
-    region: process.env.AWS_REGION || "us-east-1",
-    deployment: process.env.DEPLOYMENT_ID || "local",
-    version: process.env.APP_VERSION || "1.0.0"
-  },
   dataProcessors: [
     // Remove sensitive fields from database operations
     (telemetryData: any) => {
@@ -76,10 +70,6 @@ const telemetryConfig: TelemetryConfig = {
 
 // Initialize telemetry
 const telemetry = initializeAgentObservability(server as any, telemetryConfig)
-
-// Add custom attributes dynamically
-telemetry.addCustomAttribute("server_start_time", Date.now())
-telemetry.addCustomAttribute("process_id", process.pid)
 
 // Tool handler functions
 async function handleDatabaseQuery(query: string, params?: any[]) {

@@ -29,12 +29,6 @@ const telemetryConfig: TelemetryConfig = {
   samplingRate: parseFloat(process.env.OTEL_SAMPLING_RATE || "1.0"),
   enableUserConsent: process.env.ENABLE_USER_CONSENT === "true",
   enablePIISanitization: process.env.ENABLE_PII_SANITIZATION !== "false",
-  customAttributes: {
-    environment: process.env.NODE_ENV || "development",
-    region: process.env.AWS_REGION || "us-east-1",
-    deployment: process.env.DEPLOYMENT_ID || "local",
-    version: process.env.APP_VERSION || "1.0.0"
-  },
   dataProcessors: [
     // Custom processor to remove sensitive data
     (telemetryData: any) => {

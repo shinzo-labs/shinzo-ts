@@ -28,10 +28,6 @@ const telemetryConfig: TelemetryConfig = {
   enablePIISanitization: true,
   enableMetrics: false, // Console exporter doesn't support metrics
   enableTracing: true,
-  customAttributes: {
-    environment: "development",
-    demo: "true"
-  },
   dataProcessors: [
     // Add demo-specific processing
     (telemetryData: any) => {

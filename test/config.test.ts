@@ -1,4 +1,4 @@
-import { ConfigValidator, createDefaultConfig, mergeConfigs } from '../src/config'
+import { ConfigValidator, DEFAULT_CONFIG } from '../src/config'
 import { TelemetryConfig } from '../src/types'
 
 describe('ConfigValidator', () => {
@@ -106,55 +106,5 @@ describe('ConfigValidator', () => {
 
       expect(() => ConfigValidator.validate(config)).not.toThrow()
     })
-  })
-})
-
-describe('createDefaultConfig', () => {
-  it('should create default config with expected values', () => {
-    const defaultConfig = createDefaultConfig()
-
-    expect(defaultConfig).toEqual({
-      samplingRate: 1.0,
-      enableUserConsent: false,
-      enablePIISanitization: true,
-      exporterType: 'otlp-http',
-      enableMetrics: true,
-      enableTracing: true,
-      enableLogging: false,
-      batchTimeout: 2000,
-      maxBatchSize: 100,
-      customAttributes: {},
-      dataProcessors: []
-    })
-  })
-})
-
-describe('mergeConfigs', () => {
-  it('should merge configs correctly', () => {
-    const defaultConfig = {
-      samplingRate: 1.0,
-      enableTracing: true,
-      customAttributes: { default: 'value' },
-      dataProcessors: [jest.fn()]
-    }
-
-    const userConfig: TelemetryConfig = {
-      serviceName: 'test-service',
-      serviceVersion: '1.0.0',
-      exporterEndpoint: 'http://localhost:4318',
-      samplingRate: 0.5,
-      customAttributes: { user: 'value' },
-      dataProcessors: [jest.fn()]
-    }
-
-    const merged = mergeConfigs(defaultConfig, userConfig)
-
-    expect(merged.samplingRate).toBe(0.5)
-    expect(merged.enableTracing).toBe(true)
-    expect(merged.customAttributes).toEqual({
-      default: 'value',
-      user: 'value'
-    })
-    expect(merged.dataProcessors).toHaveLength(2)
   })
 })

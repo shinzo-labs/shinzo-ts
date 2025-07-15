@@ -1,34 +1,38 @@
-import { TelemetryManager } from './telemetry'
-import { McpServerInstrumentation } from './instrumentation'
-import { ConfigValidator } from './config'
-import { TelemetryConfig, McpServerLike, ObservabilityInstance } from './types'
-
-export { TelemetryConfig, ObservabilityInstance, McpServerLike } from './types'
+import { TelemetryManager } from './telemetry';
+import { McpServerInstrumentation } from './instrumentation';
+import { ConfigValidator } from './config';
+import { TelemetryConfig, McpServerLike, ObservabilityInstance } from './types';
 
 export function initializeAgentObservability(
   server: McpServerLike,
   config: TelemetryConfig
 ): ObservabilityInstance {
-  ConfigValidator.validate(config)
+  ConfigValidator.validate(config);
 
-  const telemetryManager = new TelemetryManager(config)
+  const telemetryManager = new TelemetryManager(config);
 
-  const instrumentation = new McpServerInstrumentation(server, telemetryManager)
-  instrumentation.instrument()
+  const instrumentation = new McpServerInstrumentation(server, telemetryManager);
+  instrumentation.instrument();
 
   return {
     shutdown: async () => {
-      instrumentation.uninstrument()
-      await telemetryManager.shutdown()
+      instrumentation.uninstrument();
+      await telemetryManager.shutdown();
+    },
+    createSpan: (name: string, attributes?: Record<string, any>) => {
+      return telemetryManager.createSpan(name, attributes);
+    },
+    recordMetric: (name: string, value: number, attributes?: Record<string, any>) => {
+      telemetryManager.recordMetric(name, value, attributes);
     }
-  }
+  };
 }
 
-export { PIISanitizer } from './sanitizer'
-export { ConfigValidator, createDefaultConfig, mergeConfigs } from './config'
-
 export type {
-  TelemetryData,
+  AuthConfig,
   DataProcessor,
-  AuthConfig
-} from './types'
+  McpServerLike,
+  ObservabilityInstance,
+  TelemetryConfig,
+  TelemetryData
+} from './types';

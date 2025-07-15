@@ -70,7 +70,7 @@ jest.mock('@opentelemetry/api', () => ({
 }))
 
 jest.mock('@opentelemetry/sdk-node', () => ({
-  NodeSDK: jest.fn(() => ({
+  NodeSDK: jest.fn().mockImplementation(() => ({
     start: jest.fn(),
     shutdown: jest.fn().mockResolvedValue(undefined)
   }))
@@ -88,19 +88,19 @@ jest.mock('@opentelemetry/semantic-conventions', () => ({
 }))
 
 jest.mock('@opentelemetry/exporter-trace-otlp-http', () => ({
-  OTLPTraceExporter: jest.fn()
+  OTLPTraceExporter: jest.fn().mockImplementation(() => ({}))
 }))
 
 jest.mock('@opentelemetry/exporter-metrics-otlp-http', () => ({
-  OTLPMetricExporter: jest.fn()
+  OTLPMetricExporter: jest.fn().mockImplementation(() => ({}))
 }))
 
 jest.mock('@opentelemetry/sdk-trace-base', () => ({
-  ConsoleSpanExporter: jest.fn()
+  ConsoleSpanExporter: jest.fn().mockImplementation(() => ({}))
 }))
 
 jest.mock('@opentelemetry/sdk-metrics', () => ({
-  PeriodicExportingMetricReader: jest.fn()
+  PeriodicExportingMetricReader: jest.fn().mockImplementation(() => ({}))
 }))
 
 // Export test utilities
