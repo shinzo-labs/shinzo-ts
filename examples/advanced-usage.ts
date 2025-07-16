@@ -24,7 +24,7 @@ const server = new Server(
 const telemetryConfig: TelemetryConfig = {
   serviceName: "advanced-mcp-server",
   serviceVersion: "2.0.0",
-  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/",
+  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/traces",
   exporterAuth: process.env.OTEL_AUTH_TOKEN ? {
     type: "bearer",
     token: process.env.OTEL_AUTH_TOKEN
@@ -35,8 +35,15 @@ const telemetryConfig: TelemetryConfig = {
   exporterType: "otlp-http",
   enableMetrics: true,
   enableTracing: true,
+  enableLogging: false,
   batchTimeout: 5000,
   maxBatchSize: 50,
+  customAttributes: {
+    environment: process.env.NODE_ENV || "development",
+    region: process.env.AWS_REGION || "us-east-1",
+    deployment: process.env.DEPLOYMENT_ID || "local",
+    version: process.env.APP_VERSION || "1.0.0"
+  },
   dataProcessors: [
     // Remove sensitive fields from database operations
     (telemetryData: any) => {
@@ -70,6 +77,10 @@ const telemetryConfig: TelemetryConfig = {
 // Initialize telemetry
 const telemetry = initializeAgentObservability(server as any, telemetryConfig)
 
+// Add custom attributes dynamically
+telemetry.addCustomAttribute("server_start_time", Date.now())
+telemetry.addCustomAttribute("process_id", process.pid)
+
 // Tool handler functions
 async function handleDatabaseQuery(query: string, params?: any[]) {
   // Simulate database operation
@@ -98,7 +109,7 @@ async function handleDatabaseQuery(query: string, params?: any[]) {
       rowCount: 2,
       executionTime: Date.now() - startTime
     }
-
+  
     dbSpan.end()
     return result
   } catch (error) {
@@ -119,7 +130,7 @@ async function handleProcessFile(filename: string, content: string) {
     // Simulate processing time based on content length
     const processingTime = Math.min(content.length / 100, 3000)
     await new Promise(resolve => setTimeout(resolve, processingTime))
-
+  
     const result = {
       filename,
       processedLines: content.split('\n').length,
@@ -130,7 +141,7 @@ async function handleProcessFile(filename: string, content: string) {
     telemetry.recordMetric("file.processing.duration", processingTime, {
       "file.type": filename.split('.').pop() || "unknown"
     })
-
+  
     processingSpan.end()
     return result
   } catch (error) {

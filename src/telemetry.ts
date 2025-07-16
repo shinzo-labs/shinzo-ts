@@ -42,7 +42,7 @@ export class TelemetryManager implements ObservabilityInstance {
 
     const traceExporter = this.createTraceExporter()
     const metricReader = this.createMetricReader()
-    
+  
     const sdkConfig: any = {
       resource,
       traceExporter: this.config.enableTracing ? traceExporter : undefined,

@@ -36,6 +36,9 @@ const telemetryConfig: TelemetryConfig = {
   ]
 }
 
+// Initialize telemetry
+const telemetry = initializeAgentObservability(server, telemetryConfig)
+
 // Add tools using the tool method
 server.tool("add_numbers",
   "Adds a list of numbers together",
@@ -92,9 +95,6 @@ server.tool("create_story",
     }
   }
 )
-
-// Initialize telemetry
-const telemetry = initializeAgentObservability(server, telemetryConfig)
 
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {

@@ -128,15 +128,15 @@ describe('McpServerInstrumentation', () => {
     it('should handle slow operations', async () => {
       // Use real timers for this test
       jest.useRealTimers()
-      
+    
       createTestTools(mockServer)
       instrumentation.instrument()
 
       // Test functionality rather than actual timing to avoid flaky tests
       const result = await mockServer.callTool('slow-operation', { delay: 5 })
-      
+    
       expect(result).toEqual({ completed: true, delay: 5 })
-      
+    
       // Restore fake timers
       jest.useFakeTimers()
     })

@@ -98,23 +98,18 @@ export class McpServerInstrumentation {
       'mcp.tool.name': name
     }
 
-    const spanAttributes = {
-      ...baseAttributes,
-      'mcp.request.id': requestId,
-      'client.address': address,
-      ...(port ? { 'client.port': port } : {})
-    }
-
     const counter = this.telemetryManager.meter.createCounter(`${method} ${name}`)
+    return async (params: any) => {
+      const spanAttributes = {
+        ...baseAttributes,
+        'mcp.request.id': requestId,
+        'client.address': address,
+        ...(port ? { 'client.port': port } : {}),
+        ...this.getParamsSpanAttributes(params)
+      }
 
-    return this.telemetryManager.startActiveSpan(`${method} ${name}`, { attributes: spanAttributes }, (span: Span) => {
-      return async (params: any) => {
+      return this.telemetryManager.startActiveSpan(`${method} ${name}`, { attributes: spanAttributes }, async (span: Span) => {
         counter.add(1)
-
-        const paramSpanAttributes = this.getParamsSpanAttributes(params)
-        for (const key in paramSpanAttributes) {
-          span.setAttribute(key, paramSpanAttributes[key])
-        }
 
         let result: any
         let error: any
@@ -143,7 +138,7 @@ export class McpServerInstrumentation {
         if (error) throw error
 
         return result
-      }
-    })
+      })
+    }
   }
 }
