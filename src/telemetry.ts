@@ -1,4 +1,4 @@
-import { trace, metrics, SpanKind } from '@opentelemetry/api'
+import { trace, metrics, Span } from '@opentelemetry/api'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { Resource } from '@opentelemetry/resources'
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions'
@@ -16,16 +16,18 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 export class TelemetryManager implements ObservabilityInstance {
   private sdk: NodeSDK | undefined
   private config: TelemetryConfig
-  private tracer: any
-  private meter: any
-  private piiSanitizer: PIISanitizer
+  public tracer: any
+  public meter: any
+  public piiSanitizer: PIISanitizer
   private sessionId: string
+  private sessionStart: number
   private isInitialized: boolean = false
   private serverInfo: { name: string, version: string }
 
   constructor(server: McpServer, config: TelemetryConfig) {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = generateUuid()
+    this.sessionStart = Date.now()
     this.piiSanitizer = new PIISanitizer(this.config.enablePIISanitization || false)
     this.initializeSDK(server)
     this.serverInfo = { name: "Shinzo Test Server", version: "1.0.0" }
@@ -113,84 +115,39 @@ export class TelemetryManager implements ObservabilityInstance {
     return headers
   }
 
-  public createSpan(name: string, attributes?: Record<string, any>) {
+  public startActiveSpan(name: string, attributes: Record<string, any>, fn: (span: Span) => void): ReturnType<typeof this.tracer.startActiveSpan> {
     if (!this.isInitialized) throw new Error('Telemetry not initialized')
 
-    const span = this.tracer.startSpan(name, {
-      kind: SpanKind.SERVER,
-      attributes: {
-        'mcp.session.id': this.sessionId,
-        ...attributes
-      }
-    })
+    const newAttributes = { 'mcp.session.id': this.sessionId, ...attributes }
 
-    return span
+    return this.tracer.startActiveSpan(name, { attributes: newAttributes }, fn)
+  }
+
+  public createSpan(name: string, attributes: Record<string, any>): Span {
+    if (!this.isInitialized) throw new Error('Telemetry not initialized')
+    return this.tracer.startSpan(name, { attributes: { 'mcp.session.id': this.sessionId, ...attributes } })
   }
 
   public recordMetric(name: string, value: number, attributes?: Record<string, any>): void {
-    if (!this.isInitialized) return
+    if (!this.isInitialized) throw new Error('Telemetry not initialized')
 
     try {
       const histogram = this.meter.createHistogram(name, {
-        description: `MCP server metric: ${name}`,
-        unit: 'ms'
+        description: 'MCP request or notification duration as observed on the receiver from the time it was received until the result or ack is sent.',
+        unit: 's'
       })
 
-      histogram.record(value, {
-        'mcp.session.id': this.sessionId,
-        ...attributes
-      })
+      histogram.record(value, { 'mcp.session.id': this.sessionId, ...attributes })
     } catch (error) {
       console.warn('Failed to record metric:', error)
     }
   }
 
-  public recordCounter(name: string, value = 1, attributes?: Record<string, any>): void {
-    if (!this.isInitialized) return
-
-    try {
-      const counter = this.meter.createCounter(name, {
-        description: `MCP server counter: ${name}`,
-        unit: '1'
-      })
-
-      counter.add(value, {
-        'mcp.session.id': this.sessionId,
-        ...attributes
-      })
-    } catch (error) {
-      console.warn('Failed to record counter:', error)
-    }
-  }
-
-  public recordGauge(name: string, value: number, attributes?: Record<string, any>): void {
-    if (!this.isInitialized) return
-
-    try {
-      const gauge = this.meter.createUpDownCounter(name, {
-        description: `MCP server gauge: ${name}`,
-        unit: '1'
-      })
-
-      gauge.add(value, {
-        'mcp.session.id': this.sessionId,
-        ...attributes
-      })
-    } catch (error) {
-      console.warn('Failed to record gauge:', error)
-    }
-  }
-
-  public getTracer() {
-    return this.tracer
-  }
-
-  public getMeter() {
-    return this.meter
-  }
-
-  public getSessionId(): string {
-    return this.sessionId
+  private recordSessionDuration(): void {
+    const sessionDuration = Date.now() - this.sessionStart
+    this.meter.recordMetric('mcp.server.session.duration', sessionDuration, {
+      'mcp.session.id': this.sessionId
+    })
   }
 
   public processTelemetryData(data: TelemetryData): TelemetryData {
@@ -210,6 +167,8 @@ export class TelemetryManager implements ObservabilityInstance {
   }
 
   public async shutdown(): Promise<void> {
+    this.recordSessionDuration()
+
     if (this.sdk) await this.sdk.shutdown()
   }
 }

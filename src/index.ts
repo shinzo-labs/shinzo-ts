@@ -1,7 +1,8 @@
-import { TelemetryManager } from './telemetry';
-import { McpServerInstrumentation } from './instrumentation';
-import { ConfigValidator } from './config';
-import { TelemetryConfig, ObservabilityInstance } from './types';
+import { TelemetryManager } from './telemetry'
+import { McpServerInstrumentation } from './instrumentation'
+import { ConfigValidator } from './config'
+import { TelemetryConfig, TelemetryData, ObservabilityInstance } from './types'
+import { Span } from '@opentelemetry/api'
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 
@@ -9,39 +10,32 @@ export function initializeAgentObservability(
   server: McpServer,
   config: TelemetryConfig
 ): ObservabilityInstance {
-  ConfigValidator.validate(config);
+  ConfigValidator.validate(config)
 
-  const telemetryManager = new TelemetryManager(server, config);
+  const telemetryManager = new TelemetryManager(server, config)
 
-  const instrumentation = new McpServerInstrumentation(server, telemetryManager);
-  instrumentation.instrument();
+  const instrumentation = new McpServerInstrumentation(server, telemetryManager)
+  instrumentation.instrument()
 
   return {
-    shutdown: async () => {
-      instrumentation.uninstrument();
-      await telemetryManager.shutdown();
-    },
-    createSpan: (name: string, attributes?: Record<string, any>) => {
-      return telemetryManager.createSpan(name, attributes);
+    startActiveSpan: (name: string, attributes: Record<string, any>, fn: (span: Span) => void) => {
+      return telemetryManager.startActiveSpan(name, attributes, fn)
     },
     recordMetric: (name: string, value: number, attributes?: Record<string, any>) => {
-      telemetryManager.recordMetric(name, value, attributes);
+      telemetryManager.recordMetric(name, value, attributes)
     },
-    recordCounter: (name: string, value?: number, attributes?: Record<string, any>) => {
-      telemetryManager.recordCounter(name, value, attributes);
+    processTelemetryData: (data: TelemetryData) => {
+      return telemetryManager.processTelemetryData(data)
     },
-    recordGauge: (name: string, value: number, attributes?: Record<string, any>) => {
-      telemetryManager.recordGauge(name, value, attributes);
-    },
-    getTracer: () => telemetryManager.getTracer(),
-    getMeter: () => telemetryManager.getMeter(),
-    getSessionId: () => telemetryManager.getSessionId()
-  };
+    shutdown: async () => {
+      await telemetryManager.shutdown()
+    }
+  }
 }
 
-export { TelemetryManager } from './telemetry';
-export { PIISanitizer } from './sanitizer';
-export { ConfigValidator } from './config';
+export { TelemetryManager } from './telemetry'
+export { PIISanitizer } from './sanitizer'
+export { ConfigValidator } from './config'
 
 export type {
   AuthConfig,
@@ -49,4 +43,4 @@ export type {
   ObservabilityInstance,
   TelemetryConfig,
   TelemetryData
-} from './types';
+} from './types'

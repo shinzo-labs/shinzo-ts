@@ -1,13 +1,11 @@
 import { TelemetryManager } from './telemetry'
-import { TelemetryData } from './types'
-import { SpanStatusCode } from '@opentelemetry/api'
-import { generateUuid } from './utils'
+import { Span, SpanStatusCode } from '@opentelemetry/api'
+import { generateUuid, getRuntimeInfo } from './utils'
 import { McpServer, RegisteredTool } from '@modelcontextprotocol/sdk/server/mcp'
 
 export class McpServerInstrumentation {
   private telemetryManager: TelemetryManager
   private server: McpServer
-  private originalMethods: Map<string, Function> = new Map()
   private isInstrumented: boolean = false
 
   constructor(server: McpServer, telemetryManager: TelemetryManager) {
@@ -18,143 +16,134 @@ export class McpServerInstrumentation {
   public instrument(): void {
     if (this.isInstrumented) return
 
-    this.instrumentToolCalls()
-    this.instrumentResourceReads()
-    this.instrumentPromptCalls()
+    this.instrumentTools()
+    this.instrumentCompletions()
+    this.instrumentLogs()
+    this.instrumentNotifications()
+    this.instrumentPings()
+    this.instrumentPrompts()
+    this.instrumentResources()
+    this.instrumentRoots()
+    this.instrumentSampling()
     this.isInstrumented = true
   }
 
-  private instrumentToolCalls(): void {
+  private instrumentTools(): void {
     const originalTool = this.server.tool.bind(this.server)
 
-    // TODO add instrumentation for the tool method
-
-    this.server.tool = (name: string, ...rest: unknown[]): RegisteredTool => {
+    this.server.tool = (name: string, ...rest: any[]): RegisteredTool => {
       const cb = rest[rest.length - 1] as Function
       if (typeof cb === 'function') {
         rest[rest.length - 1] = this.createInstrumentedHandler(cb, 'tools/call', name)
       }
-      return originalTool(name, ...rest)
+      return (originalTool as any)(name, ...rest)
     }
   }
 
-  private instrumentResourceReads(): void {
-    // TODO add instrumentation for the resource method
+  private instrumentCompletions(): void {
+    // TODO add instrumentation for the completion method
   }
 
-  private instrumentPromptCalls(): void {
-    // TODO add instrumentation for the prompt method
+  private instrumentLogs(): void {
+    // TODO add instrumentation for the logging method
   }
 
-  private instrumentNotification(): void {
+  private instrumentNotifications(): void {
     // TODO add instrumentation for the notification method
   }
 
-  private instrumentedTool
+  private instrumentPings(): void {
+    // TODO add instrumentation for the ping method
+  }
 
-  private createInstrumentedHandler(originalHandler: Function, method: string, name: string): Function {
-    return async (...args: any[]) => {
-      const startTime = Date.now()
-      const requestId = generateUuid()
+  private instrumentPrompts(): void {
+    // TODO add instrumentation for the prompt method
+  }
 
-      const span = this.telemetryManager.createSpan(`${type}s/call ${name}`, {
-        'mcp.method.name': `${type}s/call`,
-        [`mcp.${type}.name`]: name,
-        'mcp.request.id': requestId
-      })
+  private instrumentResources(): void {
+    // TODO add instrumentation for the resource method
+  }
 
-      const telemetryData: TelemetryData = {
-        timestamp: startTime,
-        sessionId: generateUuid(),
-        requestId,
-        methodName: `${type}s/call`,
-        [`${type}Name`]: name,
-        parameters: this.extractParameters(args),
-        attributes: {
-          'mcp.method.name': `${type}s/call`,
-          [`mcp.${type}.name`]: name,
-          'mcp.request.id': requestId
+  private instrumentRoots(): void {
+    // TODO add instrumentation for the root method
+  }
+
+  private instrumentSampling(): void {
+    // TODO add instrumentation for the sampling method
+  }
+
+  private getParamsSpanAttributes(params: any, prefix = 'mcp.request.argument'): Record<string, any> {
+    const attributes: Record<string, any> = {}
+    const flatten = (obj: any, path: string) => {
+      for (const key in obj) {
+        const value = obj[key]
+        const attrKey = `${path}.${key}`
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          flatten(value, attrKey)
+        } else {
+          attributes[attrKey] = value
         }
       }
+    }
+    if (params && typeof params === 'object') flatten(params, prefix)
+    return attributes
+  }
 
-      try {
-        const result = await originalHandler.apply(this.server, args)
+  private createInstrumentedHandler(originalHandler: Function, method: string, name: string): Function {
+    const requestId = generateUuid()
+    const { address, port } = getRuntimeInfo()
+
+    const baseAttributes = {
+      'mcp.method.name': method,
+      'mcp.tool.name': name
+    }
+
+    const spanAttributes = {
+      ...baseAttributes,
+      'mcp.request.id': requestId,
+      'client.address': address,
+      ...(port ? { 'client.port': port } : {})
+    }
+
+    const counter = this.telemetryManager.meter.createCounter(`${method} ${name}`)
+
+    return this.telemetryManager.startActiveSpan(`${method} ${name}`, { attributes: spanAttributes }, (span: Span) => {
+      return async (params: any) => {
+        counter.add(1)
+
+        const paramSpanAttributes = this.getParamsSpanAttributes(params)
+        for (const key in paramSpanAttributes) {
+          span.setAttribute(key, paramSpanAttributes[key])
+        }
+
+        let result: any
+        let error: any
+
+        const startTime = Date.now()
+
+        try {
+          result = await originalHandler.apply(this.server, [params])
+          span.setStatus({ code: SpanStatusCode.OK })
+        } catch (error) {
+          error = error
+          span.setStatus({ code: SpanStatusCode.ERROR, message: (error as Error).message })
+          span.setAttribute('error.type', (error as Error).name)
+        }
+
         const endTime = Date.now()
         const duration = endTime - startTime
 
-        telemetryData.result = result
-        telemetryData.duration = duration
-
-        span.setAttributes({
-          'mcp.operation.success': true,
-          'mcp.operation.duration': duration
-        })
-        span.setStatus({ code: SpanStatusCode.OK })
-
-        this.telemetryManager.recordMetric(`mcp.${type}.operation.duration`, duration, {
-          [`mcp.${type}.name`]: name,
-          'mcp.operation.success': 'true'
+        this.telemetryManager.recordMetric('mcp.server.operation.duration', duration, {
+          ...baseAttributes,
+          'error.type': error ? (error as Error).name : undefined
         })
 
-        const processedData = this.telemetryManager.processTelemetryData(telemetryData)
+        span.end()
+
+        if (error) throw error
 
         return result
-      } catch (error) {
-        const endTime = Date.now()
-        const duration = endTime - startTime
-
-        telemetryData.error = error as Error
-        telemetryData.duration = duration
-
-        span.setAttributes({
-          'mcp.operation.success': false,
-          'mcp.operation.duration': duration,
-          'error.type': (error as Error).name,
-          'error.message': (error as Error).message
-        })
-        span.setStatus({ 
-          code: SpanStatusCode.ERROR,
-          message: (error as Error).message
-        })
-
-        this.telemetryManager.recordMetric(`mcp.${type}.operation.duration`, duration, {
-          [`mcp.${type}.name`]: name,
-          'mcp.operation.success': 'false',
-          'error.type': (error as Error).name
-        })
-
-        const processedData = this.telemetryManager.processTelemetryData(telemetryData)
-
-        throw error
-      } finally {
-        span.end()
       }
-    }
-  }
-
-  private extractParameters(args: any[]): Record<string, any> {
-    if (args.length === 0) {
-      return {}
-    }
-
-    if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null) {
-      return args[0]
-    }
-
-    return args.reduce((params, arg, index) => {
-      params[`arg${index}`] = arg
-      return params
-    }, {})
-  }
-
-  public uninstrument(): void {
-    if (!this.isInstrumented) return
-
-    this.originalMethods.forEach((originalMethod, methodName) => {
-      (this.server as any)[methodName] = originalMethod
     })
-
-    this.originalMethods.clear()
-    this.isInstrumented = false
   }
 }

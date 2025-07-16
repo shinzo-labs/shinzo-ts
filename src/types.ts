@@ -1,3 +1,5 @@
+import { Span } from '@opentelemetry/api'
+
 export interface TelemetryConfig {
   exporterEndpoint: string
   serviceName?: string
@@ -48,12 +50,8 @@ export interface AuthConfig {
 }
 
 export interface ObservabilityInstance {
-  shutdown(): Promise<void>
-  createSpan(name: string, attributes?: Record<string, any>): any
+  startActiveSpan(name: string, attributes: Record<string, any>, fn: (span: Span) => void): any
   recordMetric(name: string, value: number, attributes?: Record<string, any>): void
-  recordCounter?(name: string, value?: number, attributes?: Record<string, any>): void
-  recordGauge?(name: string, value: number, attributes?: Record<string, any>): void
-  getTracer?(): any
-  getMeter?(): any
-  getSessionId?(): string
+  processTelemetryData(data: TelemetryData): TelemetryData
+  shutdown(): Promise<void>
 }
