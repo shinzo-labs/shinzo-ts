@@ -29,8 +29,8 @@ export class TelemetryManager implements ObservabilityInstance {
     this.sessionId = generateUuid()
     this.sessionStart = Date.now()
     this.piiSanitizer = new PIISanitizer(this.config.enablePIISanitization || false)
-    this.initializeSDK(server)
     this.serverInfo = { name: "Shinzo Test Server", version: "1.0.0" }
+    this.initializeSDK(server)
   }
 
   private initializeSDK(server: McpServer): void {
