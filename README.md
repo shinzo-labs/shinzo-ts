@@ -52,9 +52,86 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 
 ## ⚙️ Setup
 
-<blockquote style="border-left: 6px solid #ffe066; padding: 0.75em 1em;">
-  🚧 <strong>This section is currently under construction.</strong> See the <a href="#roadmap">Roadmap</a> section for current status and progress on features.
-</blockquote>
+### 1. Install & Use in Your Own MCP Server
+
+Add Shinzo to your MCP server project:
+
+```sh
+pnpm add shinzo
+# or
+npm install shinzo
+```
+
+Then instrument your MCP server using the SDK. Example:
+
+```ts
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
+import { initializeAgentObservability, TelemetryConfig } from "shinzo"
+
+const server = new McpServer({
+  name: "example-server",
+  version: "1.0.0",
+  description: "Example MCP server with telemetry"
+})
+
+const telemetryConfig: TelemetryConfig = {
+  serviceName: "my-mcp-server",
+  serviceVersion: "1.2.0",
+  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/traces",
+  exporterAuth: process.env.OTEL_AUTH_TOKEN ? {
+    type: "bearer",
+    token: process.env.OTEL_AUTH_TOKEN
+  } : undefined,
+  samplingRate: parseFloat(process.env.OTEL_SAMPLING_RATE || "1.0"),
+  enableUserConsent: process.env.ENABLE_USER_CONSENT === "true",
+  enablePIISanitization: process.env.ENABLE_PII_SANITIZATION !== "false",
+  dataProcessors: [
+    (telemetryData: any) => {
+      if (telemetryData.toolName === "sensitive_operation") {
+        if (telemetryData.parameters) delete telemetryData.parameters.apiKey
+      }
+      return telemetryData
+    }
+  ]
+}
+
+const telemetry = initializeAgentObservability(server, telemetryConfig)
+
+// ... add your tools and start your server as usual ...
+```
+
+See [`examples/basic-usage.ts`](./examples/basic-usage.ts) for a full working example.
+
+### 2. Local Development & Testing
+
+Clone the repo and install dependencies:
+
+```sh
+git clone https://github.com/shinzo-labs/shinzo.git
+cd shinzo
+pnpm install
+```
+
+Build the package:
+
+```sh
+pnpm build
+```
+
+Run the test suite:
+
+```sh
+pnpm test
+```
+
+You can also run specific test scripts (see `package.json` for all options):
+
+```sh
+pnpm test:unit    # Run only unit tests
+pnpm test:integration  # Run only integration tests
+pnpm lint         # Lint the codebase
+```
 
 ## 🗺️ Roadmap
 
