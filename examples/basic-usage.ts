@@ -47,17 +47,52 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: "return_a",
-        description: "Return A",
+        name: "add_numbers",
+        description: "Adds a list of numbers together",
         inputSchema: {
           type: "object",
           properties: {
-            a: {
-              type: "number",
-              description: "A number to return"
+            numbers: {
+              type: "array",
+              items: { type: "number" },
+              description: "List of numbers to add together"
             }
           },
-          required: ["a"]
+          required: ["numbers"]
+        }
+      },
+      {
+        name: "random_wait",
+        description: "Waits for a random number of seconds between 0 and 3, then returns the duration",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        }
+      },
+      {
+        name: "create_story",
+        description: "Creates a short story using provided words like madlibs",
+        inputSchema: {
+          type: "object",
+          properties: {
+            noun: {
+              type: "string",
+              description: "A noun (person, place, or thing)"
+            },
+            verb: {
+              type: "string",
+              description: "An action verb"
+            },
+            adjective: {
+              type: "string",
+              description: "A descriptive word"
+            },
+            location: {
+              type: "string",
+              description: "A place or location"
+            }
+          },
+          required: ["noun", "verb", "adjective", "location"]
         }
       }
     ]
@@ -66,16 +101,47 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
-    case "return_a":
-      const a = request.params.arguments?.a as number
+    case "add_numbers":
+      const numbers = request.params.arguments?.numbers as number[]
+      const sum = numbers.reduce((acc, num) => acc + num, 0)
       return {
         content: [
           {
             type: "text",
-            text: `Returning: ${a}`
+            text: `The sum of ${numbers.join(" + ")} = ${sum}`
           }
         ]
       }
+    
+    case "random_wait":
+      const waitTime = Math.random() * 3 // Random time between 0 and 3 seconds
+      await new Promise(resolve => setTimeout(resolve, waitTime * 1000))
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Waited for ${waitTime.toFixed(2)} seconds`
+          }
+        ]
+      }
+    
+    case "create_story":
+      const { noun, verb, adjective, location } = request.params.arguments as {
+        noun: string
+        verb: string
+        adjective: string
+        location: string
+      }
+      const story = `Once upon a time, there was a ${adjective} ${noun} who loved to ${verb}. One day, they decided to visit ${location}. It was the most amazing adventure they had ever experienced!`
+      return {
+        content: [
+          {
+            type: "text",
+            text: story
+          }
+        ]
+      }
+
     default:
       throw new Error(`Unknown tool: ${request.params.name}`)
   }
