@@ -90,7 +90,7 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 
 ## 🤝 Contributing
 
-Contributions to Shinzo are appreciated, whether you are a veteran building sophisticated enterprise AI agent systems or a newcomer just testing the waters. Shinzo accepts contributions both in terms of direct code contributions as well as non-technical support like community engagement, user testing, and professional partnerships. Feel free to join the conversation on our [Discord server](https://discord.gg/qrVWEuRh) and checkout  the [Contributing](./CONTRIBUTING.md) page to learn how you can become a contributor.
+Contributions to Shinzo are appreciated, whether you are a veteran building sophisticated enterprise AI agent systems or a newcomer just testing the waters. Shinzo accepts contributions both in terms of direct code contributions as well as non-technical support like community engagement, user testing, and professional partnerships. Feel free to join the conversation on our [Discord server](https://discord.gg/UYUdSdp5N8) and checkout  the [Contributing](./CONTRIBUTING.md) page to learn how you can become a contributor.
 
 ## 📄 License
 
