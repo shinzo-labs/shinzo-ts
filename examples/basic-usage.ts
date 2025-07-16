@@ -1,21 +1,15 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js"
+import { z } from "zod"
 
 import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js"
 
 // Create MCP server
-const server = new Server(
-  {
-    name: "example-server",
-    version: "1.0.0",
-  },
-  {
-    capabilities: {
-      tools: {},
-    },
-  }
-)
+const server = new McpServer({
+  name: "example-server",
+  version: "1.0.0",
+  description: "Example MCP server with telemetry"
+})
 
 // Configure telemetry with comprehensive options
 const telemetryConfig: TelemetryConfig = {
@@ -42,113 +36,65 @@ const telemetryConfig: TelemetryConfig = {
   ]
 }
 
-// Add tool handlers
-server.setRequestHandler(ListToolsRequestSchema, async () => {
-  return {
-    tools: [
-      {
-        name: "add_numbers",
-        description: "Adds a list of numbers together",
-        inputSchema: {
-          type: "object",
-          properties: {
-            numbers: {
-              type: "array",
-              items: { type: "number" },
-              description: "List of numbers to add together"
-            }
-          },
-          required: ["numbers"]
+// Add tools using the tool method
+server.tool("add_numbers",
+  "Adds a list of numbers together",
+  {
+    numbers: z.array(z.number()).describe("List of numbers to add together")
+  },
+  async (params) => {
+    const sum = params.numbers.reduce((acc, num) => acc + num, 0)
+    return {
+      content: [
+        {
+          type: "text",
+          text: `The sum of ${params.numbers.join(" + ")} = ${sum}`
         }
-      },
-      {
-        name: "random_wait",
-        description: "Waits for a random number of seconds between 0 and 3, then returns the duration",
-        inputSchema: {
-          type: "object",
-          properties: {}
-        }
-      },
-      {
-        name: "create_story",
-        description: "Creates a short story using provided words like madlibs",
-        inputSchema: {
-          type: "object",
-          properties: {
-            noun: {
-              type: "string",
-              description: "A noun (person, place, or thing)"
-            },
-            verb: {
-              type: "string",
-              description: "An action verb"
-            },
-            adjective: {
-              type: "string",
-              description: "A descriptive word"
-            },
-            location: {
-              type: "string",
-              description: "A place or location"
-            }
-          },
-          required: ["noun", "verb", "adjective", "location"]
-        }
-      }
-    ]
+      ]
+    }
   }
-})
+)
 
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  switch (request.params.name) {
-    case "add_numbers":
-      const numbers = request.params.arguments?.numbers as number[]
-      const sum = numbers.reduce((acc, num) => acc + num, 0)
-      return {
-        content: [
-          {
-            type: "text",
-            text: `The sum of ${numbers.join(" + ")} = ${sum}`
-          }
-        ]
-      }
-    
-    case "random_wait":
-      const waitTime = Math.random() * 3 // Random time between 0 and 3 seconds
-      await new Promise(resolve => setTimeout(resolve, waitTime * 1000))
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Waited for ${waitTime.toFixed(2)} seconds`
-          }
-        ]
-      }
-    
-    case "create_story":
-      const { noun, verb, adjective, location } = request.params.arguments as {
-        noun: string
-        verb: string
-        adjective: string
-        location: string
-      }
-      const story = `Once upon a time, there was a ${adjective} ${noun} who loved to ${verb}. One day, they decided to visit ${location}. It was the most amazing adventure they had ever experienced!`
-      return {
-        content: [
-          {
-            type: "text",
-            text: story
-          }
-        ]
-      }
-
-    default:
-      throw new Error(`Unknown tool: ${request.params.name}`)
+server.tool("random_wait",
+  "Waits for a random number of seconds between 0 and 3, then returns the duration",
+  {},
+  async () => {
+    const waitTime = Math.random() * 3 // Random time between 0 and 3 seconds
+    await new Promise(resolve => setTimeout(resolve, waitTime * 1000))
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Waited for ${waitTime.toFixed(2)} seconds`
+        }
+      ]
+    }
   }
-})
+)
+
+server.tool("create_story",
+  "Creates a short story using provided words like madlibs",
+  {
+    noun: z.string().describe("A noun (person, place, or thing)"),
+    verb: z.string().describe("An action verb"),
+    adjective: z.string().describe("A descriptive word"),
+    location: z.string().describe("A place or location")
+  },
+  async (params) => {
+    const story = `Once upon a time, there was a ${params.adjective} ${params.noun} who loved to ${params.verb}. One day, they decided to visit ${params.location}. It was the most amazing adventure they had ever experienced!`
+    return {
+      content: [
+        {
+          type: "text",
+          text: story
+        }
+      ]
+    }
+  }
+)
 
 // Initialize telemetry
-const telemetry = initializeAgentObservability(server as any, telemetryConfig)
+const telemetry = initializeAgentObservability(server, telemetryConfig)
 
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {
