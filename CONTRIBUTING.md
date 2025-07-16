@@ -43,4 +43,4 @@ Shinzo can only grow with the support of a vibrant developer community and stron
 
 ## Contact
 
-If you have any questions or comments about the guidelines here or anything else about the software, feel free to join the discussion on our [Discord server](https://discord.gg/qrVWEuRh) or contact the project maintainer Austin Born (austin@shinzolabs.com, [@austinbuilds](https://x.com/austinbuilds)) directly.
+If you have any questions or comments about the guidelines here or anything else about the software, feel free to join the discussion on our [Discord server](https://discord.gg/UYUdSdp5N8) or contact the project maintainer Austin Born (austin@shinzolabs.com, [@austinbuilds](https://x.com/austinbuilds)) directly.
