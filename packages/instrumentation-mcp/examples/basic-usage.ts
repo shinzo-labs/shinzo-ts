@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod"
 
-import { instrumentServer, TelemetryConfig } from "../dist/index.js"
+import { instrumentServer, TelemetryConfig } from "../src/index"
 
 const NAME = "my-mcp-server"
 const VERSION = "1.2.0"

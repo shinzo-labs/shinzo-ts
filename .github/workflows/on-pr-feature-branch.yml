@@ -23,6 +23,10 @@ jobs:
           fetch-depth: 0
       - name: Fetch base branch
         run: git fetch origin main:refs/remotes/origin/main
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
@@ -31,12 +35,24 @@ jobs:
         run: npx @changesets/cli status --since=origin/main
 
   validate-build:
-    name: Validate build
-    runs-on: ['ubuntu-latest']
+    name: Validate build and tests
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
-      - name: Run validation script
-        run: .github/scripts/validate-build.sh
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run linting
+        run: pnpm run lint
+      - name: Run type checking
+        run: pnpm run type-check
+      - name: Run tests
+        run: pnpm run test:ci
+      - name: Build packages
+        run: pnpm run build

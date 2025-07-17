@@ -29,7 +29,8 @@
     "type-check": "pnpm -r run type-check",
     "clean": "pnpm -r run clean",
     "prepare": "pnpm run build",
-    "prepack": "pnpm run clean && pnpm run build"
+    "prepack": "pnpm run clean && pnpm run build",
+    "publish": "pnpm -r publish --access public"
   },
   "keywords": [
     "mcp",
@@ -56,6 +57,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@changesets/cli": "^2.27.9",
     "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",

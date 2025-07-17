@@ -10,26 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-version:
-    runs-on: ubuntu-latest
-    needs: check-changesets
-    outputs:
-      version_changed: ${{ steps.version-check.outputs.changed }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Check if version changed
-        id: version-check
-        run: |
-          current_version=$(jq -r .version package.json)
-          base_version=$(git show HEAD^:package.json | jq -r .version)
-          if [ "$current_version" != "$base_version" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
-
   check-changesets:
     runs-on: ubuntu-latest
     outputs:
@@ -38,6 +18,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Check for changesets
         id: changeset-check
         run: |
@@ -50,65 +38,34 @@ jobs:
   create-release-pr:
     name: Create or update Release PR
     runs-on: ubuntu-latest
-    needs: [check-version, check-changesets]
-    if: needs.check-changesets.outputs.hasChangesets == 'true' && needs.check-version.outputs.version_changed == 'false'
+    needs: check-changesets
+    if: needs.check-changesets.outputs.hasChangesets == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Get next version from changesets
-        id: get-next-version
-        run: |
-          npx changeset status --output changeset-status.json
-          version=$(jq -r '.releases[0].newVersion' changeset-status.json)
-          echo "next_version=$version" >> $GITHUB_OUTPUT
       - name: Create or update Release PR
         uses: changesets/action@v1
         with:
           publish: false
-          title: "Release v${{ steps.get-next-version.outputs.next_version }}"
+          title: "Release packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update MCP version
-        run: .github/scripts/update-mcp-version.sh
-        env:
-          PATH_TO_FILE: 'index.js'
 
-  gh-release:
-    name: GH Release
+  publish-packages:
+    name: Publish packages to npm
     runs-on: ubuntu-latest
-    needs: check-version
-    if: needs.check-version.outputs.version_changed == 'true'
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Get release version
-        id: get-version
-        run: |
-          echo "result=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
-      - name: Get release body
-        run: |
-          # Get the PR body to use in the GH release body
-          gh pr list --search "$(git rev-parse HEAD)" --state merged --json number,body --jq '"This release was merged in PR #" + (.[0].number | tostring) + "\n\n" + (.[0].body | split("# Releases")[1:] | join("# Releases"))' > pr_body.tmp
-      - name: Create release
-        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
-        with:
-          tag_name: v${{ steps.get-version.outputs.result }}
-          name: Release v${{ steps.get-version.outputs.result }}
-          body_path: pr_body.tmp
-
-  npm-publish:
-    name: Publish to npm registry
-    runs-on: ubuntu-latest
-    needs: check-version
-    if: needs.check-version.outputs.version_changed == 'true'
+    needs: check-changesets
+    if: needs.check-changesets.outputs.hasChangesets == 'false'
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - name: Checkout code
@@ -116,13 +73,19 @@ jobs:
       - name: Setup Node.js and npm auth
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '20'
           registry-url: 'https://registry.npmjs.org'
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Publish
-        run: npm publish --provenance --access public
+      - name: Build packages
+        run: pnpm run build
+      - name: Publish packages
+        uses: changesets/action@v1
+        with:
+          publish: pnpm run publish
+          title: "Release packages"
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
