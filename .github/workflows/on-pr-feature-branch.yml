@@ -1,0 +1,42 @@
+name: On PR for Feature Branch
+
+on:
+  pull_request:
+    branches-ignore:
+      - changeset-release/main
+
+env:
+  UPSTREAM_BRANCH: origin/${{ github.base_ref }}
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}-checks
+  cancel-in-progress: true
+
+jobs:
+  check-changeset:
+    name: Check for changeset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch base branch
+        run: git fetch origin main:refs/remotes/origin/main
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check for changeset
+        run: npx @changesets/cli status --since=origin/main
+
+  validate-build:
+    name: Validate build
+    runs-on: ['ubuntu-latest']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Run validation script
+        run: .github/scripts/validate-build.sh
