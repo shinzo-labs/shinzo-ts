@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 <div align="center">
-    <a href="https://github.com/-ts"><img src="https://github.com/user-attachments/assets/78542e5b-1da1-44ad-a3e2-5b4eb9e6a962" alt="Logo" width="256" height="256"></a>
+    <a href="https://github.com/shinzo-labs/shinzo-ts"><img src="https://github.com/user-attachments/assets/78542e5b-1da1-44ad-a3e2-5b4eb9e6a962" alt="Logo" width="256" height="256"></a>
     <h1 align="center">
         Shinzo: The Composable Analytics Stack for MCP Servers
     </h1>
@@ -44,7 +44,7 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 
 ### ✨ Key Features
 
-- **Automatic Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.
+- **Automatic Instrumentation**: One line of code gives you instant instrumentation for your MCP server's capabilities.
 - **Anonymous, Configurable Telemetry**: Built-in PII sanitization and user consent mechanisms ensure you always remain compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation.
 - **Full Control**: All components of Shinzo can be self-hosted with our sustainable use license or cloud hosted through Shinzo Labs.
 - **Custom Analytics Dashboards**: Self-hosted, real-time dashboards for tool usage, performance, and traces.
@@ -66,7 +66,7 @@ Then instrument your MCP server using the SDK. Example:
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { initializeAgentObservability, TelemetryConfig } from "@shinzo/instrumentation-mcp"
+import { instrumentServer, TelemetryConfig } from "@shinzo/instrumentation-mcp"
 
 const NAME = "my-mcp-server"
 const VERSION = "1.0.0"
@@ -85,7 +85,7 @@ const telemetryConfig: TelemetryConfig = {
 }
 
 // Initialize telemetry
-const telemetry = initializeAgentObservability(server, telemetryConfig)
+const telemetry = instrumentServer(server, telemetryConfig)
 
 // Add tools using the tool method
 server.tool(...)

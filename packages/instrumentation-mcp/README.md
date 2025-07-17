@@ -1,6 +1,13 @@
-# @shinzo/instrumentation-mcp
+<div align="center">
+  <a href="https://github.com/shinzo-labs/shinzo-ts">
+    <img src="https://github.com/user-attachments/assets/78542e5b-1da1-44ad-a3e2-5b4eb9e6a962" alt="Shinzo Logo" width="180" height="180">
+  </a>
+  <h1 align="center">@shinzo/instrumentation-mcp</h1>
+  <p align="center">
+    <b>OpenTelemetry instrumentation for MCP servers.</b><br/>
 
-OpenTelemetry instrumentation for MCP servers.
+  </p>
+</div>
 
 ## Installation
 
@@ -16,7 +23,7 @@ For minimal-footprint usage, just pass in the server name, version, and exporter
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { initializeAgentObservability, TelemetryConfig } from "@shinzo/instrumentation-mcp"
+import { instrumentServer, TelemetryConfig } from "@shinzo/instrumentation-mcp"
 
 const NAME = "my-mcp-server"
 const VERSION = "1.0.0"
@@ -35,7 +42,7 @@ const telemetryConfig: TelemetryConfig = {
 }
 
 // Initialize telemetry
-const telemetry = initializeAgentObservability(server, telemetryConfig)
+const telemetry = instrumentServer(server, telemetryConfig)
 
 // Add tools using the tool method
 server.tool(...)
@@ -45,7 +52,7 @@ The TelemetryConfig also exposes a number of other options for precise telemetry
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { initializeAgentObservability, TelemetryConfig } from "@shinzo/instrumentation-mcp"
+import { instrumentServer, TelemetryConfig } from "@shinzo/instrumentation-mcp"
 
 const NAME = "my-other-mcp-server"
 const VERSION = "1.0.0"
@@ -79,7 +86,7 @@ const telemetryConfig: TelemetryConfig = {
   ]
 }
 
-const telemetry = initializeAgentObservability(server, telemetryConfig)
+const telemetry = instrumentServer(server, telemetryConfig)
 
 // Add tools using the tool method
 server.tool(...)

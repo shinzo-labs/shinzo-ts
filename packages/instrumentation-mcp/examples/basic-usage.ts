@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod"
 
-import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js"
+import { instrumentServer, TelemetryConfig } from "../dist/index.js"
 
 const NAME = "my-mcp-server"
 const VERSION = "1.2.0"
@@ -28,7 +28,7 @@ const telemetryConfig: TelemetryConfig = {
 }
 
 // Initialize telemetry
-const telemetry = initializeAgentObservability(server, telemetryConfig)
+const telemetry = instrumentServer(server, telemetryConfig)
 
 // Add tools using the tool method
 server.tool("add_numbers",

@@ -5,7 +5,7 @@ import { MetricOptions, Span } from '@opentelemetry/api'
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 
-export function initializeAgentObservability(
+export function instrumentServer(
   server: McpServer,
   config: TelemetryConfig
 ): ObservabilityInstance {

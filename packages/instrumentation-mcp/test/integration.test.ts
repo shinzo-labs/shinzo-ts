@@ -1,4 +1,4 @@
-import { initializeAgentObservability } from '../src/index'
+import { instrumentServer } from '../src/index'
 import { MockMcpServer, createTestTools, createTestResources, createTestPrompts } from './mocks/MockMcpServer'
 import { TelemetryConfig, ObservabilityInstance } from '../src/types'
 
@@ -126,14 +126,14 @@ describe('Integration Tests', () => {
 
   describe('Full Integration Flow', () => {
     it('should initialize observability and instrument MCP server', () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       expect(observabilityInstance).toBeDefined()
       expect(observabilityInstance.shutdown).toBeDefined()
     })
 
     it('should execute tool calls with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       const result = await mockServer.callTool('calculator', {
         operation: 'add',
@@ -145,7 +145,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle failed tool calls with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       await expect(mockServer.callTool('failing-tool', {
         errorMessage: 'Custom error message'
@@ -153,7 +153,7 @@ describe('Integration Tests', () => {
     })
 
     it('should execute resource calls with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       const result = await mockServer.callResource('file://test.txt')
 
@@ -165,7 +165,7 @@ describe('Integration Tests', () => {
     })
 
     it('should execute prompt calls with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       const result = await mockServer.callPrompt('greeting', { name: 'Integration Test' })
 
@@ -180,7 +180,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle multiple concurrent operations', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       const promises = [
         mockServer.callTool('calculator', { operation: 'add', a: 1, b: 2 }),
@@ -199,7 +199,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle graceful shutdown', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       await mockServer.callTool('calculator', { operation: 'add', a: 1, b: 2 })
 
@@ -214,7 +214,7 @@ describe('Integration Tests', () => {
       } as TelemetryConfig
 
       expect(() => {
-        initializeAgentObservability(mockServer as any, invalidConfig)
+        instrumentServer(mockServer as any, invalidConfig)
       }).toThrow('exporterEndpoint is required')
     })
 
@@ -227,7 +227,7 @@ describe('Integration Tests', () => {
         prompt: jest.fn()
       }
 
-      observabilityInstance = initializeAgentObservability(serverWithoutEvents as any, mockConfig)
+      observabilityInstance = instrumentServer(serverWithoutEvents as any, mockConfig)
 
       expect(() => observabilityInstance.shutdown()).not.toThrow()
     })
@@ -235,7 +235,7 @@ describe('Integration Tests', () => {
 
   describe('Performance Tests', () => {
     it('should maintain performance with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       const iterations = 10 // Reduced for faster tests
       const startTime = Date.now()
@@ -256,7 +256,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle high frequency operations', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
+      observabilityInstance = instrumentServer(mockServer as any, mockConfig)
 
       const promises = []
       for (let i = 0; i < 20; i++) {
@@ -284,7 +284,7 @@ describe('Integration Tests', () => {
       }
 
       expect(() => {
-        initializeAgentObservability(mockServer as any, configWithFailingProcessor)
+        instrumentServer(mockServer as any, configWithFailingProcessor)
       }).not.toThrow()
     })
 
@@ -295,7 +295,7 @@ describe('Integration Tests', () => {
       }
 
       expect(() => {
-        initializeAgentObservability(minimalServer as any, mockConfig)
+        instrumentServer(minimalServer as any, mockConfig)
       }).not.toThrow()
     })
 
@@ -303,7 +303,7 @@ describe('Integration Tests', () => {
       // This test verifies the system handles errors gracefully
       // In a real scenario, OpenTelemetry errors would be caught and handled
       expect(() => {
-        initializeAgentObservability(mockServer as any, mockConfig)
+        instrumentServer(mockServer as any, mockConfig)
       }).not.toThrow() // Should not throw due to our mocks
     })
   })
