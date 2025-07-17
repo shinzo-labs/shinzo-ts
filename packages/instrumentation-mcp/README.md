@@ -1,0 +1,104 @@
+# @shinzo/instrumentation-mcp
+
+OpenTelemetry instrumentation for MCP servers.
+
+## Installation
+
+```bash
+npm install @shinzo/instrumentation-mcp
+# or
+pnpm add @shinzo/instrumentation-mcp
+```
+
+## Usage
+
+For minimal-footprint usage, just pass in the server name, version, and exporter endpoint:
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { initializeAgentObservability, TelemetryConfig } from "@shinzo/instrumentation-mcp"
+
+const NAME = "my-mcp-server"
+const VERSION = "1.0.0"
+
+const server = new McpServer({
+  name: NAME,
+  version: VERSION,
+  description: "Example MCP server with telemetry"
+})
+
+// Use TelemetryConfig to set configuration options
+const telemetryConfig: TelemetryConfig = {
+  serverName: NAME,
+  serverVersion: VERSION,
+  exporterEndpoint: "http://localhost:4318/v1" // /trace and /metrics are added automatically
+}
+
+// Initialize telemetry
+const telemetry = initializeAgentObservability(server, telemetryConfig)
+
+// Add tools using the tool method
+server.tool(...)
+```
+
+The TelemetryConfig also exposes a number of other options for precise telemetry processing:
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { initializeAgentObservability, TelemetryConfig } from "@shinzo/instrumentation-mcp"
+
+const NAME = "my-other-mcp-server"
+const VERSION = "1.0.0"
+
+const server = new McpServer({
+  name: NAME,
+  version: VERSION,
+  description: "Example MCP server with telemetry"
+})
+
+const telemetryConfig: TelemetryConfig = {
+  serviceName: NAME,
+  serviceVersion: VERSION,
+  exporterEndpoint: "http://localhost:4318/v1",
+  exporterAuth: {
+    type: "bearer",
+    token: process.env.OTEL_AUTH_TOKEN
+  },
+  enablePIISanitization: false,
+  enableTracing: false,
+  samplingRate: 0.7,
+  dataProcessors: [
+    (telemetryData: any) => {
+      if (telemetryData['mcp.tool.name'] === "sensitive_operation") {
+        for (const key of Object.keys(telemetryData)) {
+          if (key.startsWith('mcp.request.argument')) delete telemetryData[key]
+        }
+      }
+      return telemetryData
+    }
+  ]
+}
+
+const telemetry = initializeAgentObservability(server, telemetryConfig)
+
+// Add tools using the tool method
+server.tool(...)
+```
+
+## Features
+
+- **Automatic Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.
+- **Anonymous, Configurable Telemetry**: Built-in PII sanitization and user consent mechanisms ensure you always remain compliant with GDPR, CCPA/CPRA and other data privacy regulation.
+- **OpenTelemetry-Compatible**: Fully compatible with OpenTelemetry standards and can be used with any OpenTelemetry-compatible service.
+
+## Documentation
+
+For complete documentation, examples, and guides, visit the [main Shinzo repository](https://github.com/shinzo-labs/shinzo-ts).
+
+## License
+
+This package is part of the [Shinzo](https://github.com/shinzo-labs/shinzo-ts) project and is distributed under the [Sustainable Use License](https://github.com/shinzo-labs/shinzo-ts/blob/main/LICENSE.md).
+
+## Contributing
+
+Contributions are welcome! Please see the [Contributing Guide](https://github.com/shinzo-labs/shinzo-ts/blob/main/CONTRIBUTING.md) in the main repository.

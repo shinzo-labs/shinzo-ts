@@ -1,11 +1,11 @@
-# Shinzo Examples
+# Shinzo Instrumentation MCP Examples
 
-This directory contains example MCP servers demonstrating different configurations and use cases for Shinzo telemetry.
+This directory contains example MCP servers demonstrating different configurations and use cases for the Shinzo Instrumentation MCP package.
 
 ## Examples
 
 ### 1. Basic Usage (`basic-usage.ts`)
-A simple MCP server with basic telemetry configuration.
+A simple MCP server with basic telemetry configuration using the `@shinzo/instrumentation-mcp` package.
 
 **Features:**
 - Basic telemetry setup with OTLP HTTP exporter
@@ -14,7 +14,7 @@ A simple MCP server with basic telemetry configuration.
 - Custom data processors
 
 ### 2. Advanced Usage (`advanced-usage.ts`)
-A comprehensive example showing advanced telemetry features.
+A comprehensive example showing advanced telemetry features with `@shinzo/instrumentation-mcp`.
 
 **Features:**
 - Full telemetry configuration with environment variables
@@ -41,10 +41,10 @@ A development-focused example that outputs telemetry to the console.
 
 ### Installation
 ```bash
-# Install dependencies
+# From the instrumentation-mcp package root
 pnpm install
 
-# Build the project
+# Build the package
 pnpm run build
 ```
 
@@ -101,7 +101,7 @@ To test these examples with an MCP client, you can use the MCP CLI or integrate 
 ### Using MCP CLI
 ```bash
 # Install MCP CLI
-npm install -g @modelcontextprotocol/cli
+yarn global add @modelcontextprotocol/cli # or npm install -g @modelcontextprotocol/cli
 
 # Run example server
 mcp run npx ts-node examples/basic-usage.ts
@@ -112,9 +112,9 @@ Add to your Claude Desktop configuration:
 ```json
 {
   "servers": {
-    "shinzo-example": {
+    "shinzo-instrumentation-mcp-example": {
       "command": "npx",
-      "args": ["ts-node", "/path/to/shinzo/examples/basic-usage.ts"]
+      "args": ["ts-node", "/path/to/shinzo/packages/instrumentation-mcp/examples/basic-usage.ts"]
     }
   }
 }
@@ -125,8 +125,7 @@ Add to your Claude Desktop configuration:
 All examples will generate telemetry data including:
 - Tool execution traces
 - Performance metrics
-- Error tracking
-- Custom attributes
+- MCP attributes using standard OpenTelemetry semantic conventions
 - PII-sanitized data (when enabled)
 
 The telemetry data can be sent to any OpenTelemetry-compatible collector or viewed in the console for debugging.

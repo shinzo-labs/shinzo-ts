@@ -1,20 +1,20 @@
 <a id="readme-top"></a>
 <div align="center">
-    <a href="https://github.com/shinzo-labs/shinzo"><img src="https://github.com/user-attachments/assets/78542e5b-1da1-44ad-a3e2-5b4eb9e6a962" alt="Logo" width="256" height="256"></a>
+    <a href="https://github.com/-ts"><img src="https://github.com/user-attachments/assets/78542e5b-1da1-44ad-a3e2-5b4eb9e6a962" alt="Logo" width="256" height="256"></a>
     <h1 align="center">
         Shinzo: The Composable Analytics Stack for MCP Servers
     </h1>
     <p align=center>
-        <a href="https://github.com/shinzo-labs/shinzo/stargazers"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fshinzo-labs%2Fshinzo%2Fstargazers&query=%24.length&logo=github&label=stars&color=e3b341" alt="Stars"></a>
-        <a href="https://github.com/shinzo-labs/shinzo/forks"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fshinzo-labs%2Fshinzo%2Fforks&query=%24.length&logo=github&label=forks&color=8957e5" alt="Forks"></a>
-        <a href="https://github.com/shinzo-labs/shinzo/pulls"><img src="https://img.shields.io/badge/build-passing-green" alt="Build"></a>
-        <a href="https://github.com/shinzo-labs/shinzo/graphs/contributors"><img src="https://img.shields.io/badge/contributors-welcome-339933?logo=github" alt="contributors welcome"></a>
+        <a href="https://github.com/shinzo-labs/shinzo-ts/stargazers"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fshinzo-labs%2Fshinzo%2Fstargazers&query=%24.length&logo=github&label=stars&color=e3b341" alt="Stars"></a>
+        <a href="https://github.com/shinzo-labs/shinzo-ts/forks"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fshinzo-labs%2Fshinzo%2Fforks&query=%24.length&logo=github&label=forks&color=8957e5" alt="Forks"></a>
+        <a href="https://github.com/shinzo-labs/shinzo-ts/pulls"><img src="https://img.shields.io/badge/build-passing-green" alt="Build"></a>
+        <a href="https://github.com/shinzo-labs/shinzo-ts/graphs/contributors"><img src="https://img.shields.io/badge/contributors-welcome-339933?logo=github" alt="contributors welcome"></a>
         <a href="https://discord.gg/UYUdSdp5N8"><img src="https://discord-live-members-count-badge.vercel.app/api/discord-members?guildId=1079318797590216784" alt="Discord"></a>
         <a href="https://www.linkedin.com/company/shinzo-labs"><img src="https://img.shields.io/badge/linkedin-0a66c2?logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaGVpZ2h0PSI3MiIgdmlld0JveD0iMCAwIDcyIDcyIiB3aWR0aD0iNzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNOCw3MiBMNjQsNzIgQzY4LjQxODI3OCw3MiA3Miw2OC40MTgyNzggNzIsNjQgTDcyLDggQzcyLDMuNTgxNzIyIDY4LjQxODI3OCwtOC4xMTYyNDUwMWUtMTYgNjQsMCBMOCwwIEMzLjU4MTcyMiw4LjExNjI0NTAxZS0xNiAtNS40MTA4MzAwMWUtMTYsMy41ODE3MjIgMCw4IEwwLDY0IEM1LjQxMDgzMDAxZS0xNiw2OC40MTgyNzggMy41ODE3MjIsNzIgOCw3MiBaIiBmaWxsPSIjMDA3RUJCIi8+PHBhdGggZD0iTTYyLDYyIEw1MS4zMTU2MjUsNjIgTDUxLjMxNTYyNSw0My44MDIxMTQ5IEM1MS4zMTU2MjUsMzguODEyNzU0MiA0OS40MTk3OTE3LDM2LjAyNDUzMjMgNDUuNDcwNzAzMSwzNi4wMjQ1MzIzIEM0MS4xNzQ2MDk0LDM2LjAyNDUzMjMgMzguOTMwMDc4MSwzOC45MjYxMTAzIDM4LjkzMDA3ODEsNDMuODAyMTE0OSBMMzguOTMwMDc4MSw2MiBMMjguNjMzMzMzMyw2MiBMMjguNjMzMzMzMywyNy4zMzMzMzMzIEwzOC45MzAwNzgxLDI3LjMzMzMzMzMgTDM4LjkzMDA3ODEsMzIuMDAyOTI4MyBDMzguOTMwMDc4MSwzMi4wMDI5MjgzIDQyLjAyNjA0MTcsMjYuMjc0MjE1MSA0OS4zODI1NTIxLDI2LjI3NDIxNTEgQzU2LjczNTY3NzEsMjYuMjc0MjE1MSA2MiwzMC43NjQ0NzA1IDYyLDQwLjA1MTIxMiBMNjIsNjIgWiBNMTYuMzQ5MzQ5LDIyLjc5NDAxMzMgQzEyLjg0MjA1NzMsMjIuNzk0MDEzMyAxMCwxOS45Mjk2NTY3IDEwLDE2LjM5NzAwNjcgQzEwLDEyLjg2NDM1NjYgMTIuODQyMDU3MywxMCAxNi4zNDkzNDksMTAgQzE5Ljg1NjY0MDYsMTAgMjIuNjk3MDA1MiwxMi44NjQzNTY2IDIyLjY5NzAwNTIsMTYuMzk3MDA2NyBDMjIuNjk3MDA1MiwxOS45Mjk2NTY3IDE5Ljg1NjY0MDYsMjIuNzk0MDEzMyAxNi4zNDkzNDksMjIuNzk0MDEzMyBaIE0xMS4wMzI1NTIxLDYyIEwyMS43Njk0MDEsNjIgTDIxLjc2OTQwMSwyNy4zMzMzMzMzIEwxMS4wMzI1NTIxLDI3LjMzMzMzMzMgTDExLjAzMjU1MjEsNjIgWiIgZmlsbD0iI0ZGRiIvPjwvZz48L3N2Zz4=" alt="LinkedIn"></a>
     </p>
     Shinzo is the first fully composable analytics solution built with OpenTelemetry conventions for the MCP ecosystem. Gain insight into agent usage patterns, contextualize tool calls, and analyze performance of your servers across platforms. The complete stack can be installed in just a few commands with an emphasis on ease of use and flexibility.
     <p align=center>
-        <a href="https://github.com/shinzo-labs/shinzo"><strong>Explore the docs »</strong></a>
+        <a href="https://github.com/shinzo-labs/shinzo-ts"><strong>Explore the docs »</strong></a>
     </p>
 </div>
 
@@ -57,9 +57,9 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 Add Shinzo to your MCP server project:
 
 ```sh
-pnpm add shinzo
+pnpm add @shinzo/instrumentation-mcp
 # or
-npm install shinzo
+npm install @shinzo/instrumentation-mcp
 ```
 
 Then instrument your MCP server using the SDK. Example:
@@ -67,7 +67,7 @@ Then instrument your MCP server using the SDK. Example:
 ```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
-import { initializeAgentObservability, TelemetryConfig } from "shinzo"
+import { initializeAgentObservability, TelemetryConfig } from "@shinzo/instrumentation-mcp"
 
 const server = new McpServer({
   name: "example-server",
@@ -101,14 +101,14 @@ const telemetry = initializeAgentObservability(server, telemetryConfig)
 // ... add your tools and start your server as usual ...
 ```
 
-See [`examples/basic-usage.ts`](./examples/basic-usage.ts) for a full working example.
+See [`packages/instrumentation-mcp/examples/basic-usage.ts`](./packages/instrumentation-mcp/examples/basic-usage.ts) for a full working example.
 
 ### 2. Local Development & Testing
 
 Clone the repo and install dependencies:
 
 ```sh
-git clone https://github.com/shinzo-labs/shinzo.git
+git clone https://github.com/shinzo-labs/shinzo-ts.git
 cd shinzo
 pnpm install
 ```

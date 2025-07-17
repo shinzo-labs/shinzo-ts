@@ -20,11 +20,11 @@ As a member of our community, you are expected to follow all rules in our [Contr
 
 ### Issues
 
-If you would like to raise any issues, please do so in the [Issues](https://github.com/shinzo-labs/shinzo/issues) section and a core contributor will respond in a timely manner. Issue threads may be closed if there are no additional comments added within 7 days of the last update by a contributor on the thread.
+If you would like to raise any issues, please do so in the [Issues](https://github.com/shinzo-labs/shinzo-ts/issues) section and a core contributor will respond in a timely manner. Issue threads may be closed if there are no additional comments added within 7 days of the last update by a contributor on the thread.
 
 ### Pull Requests
 
-If you would like to contribute code to the codebase, you may review the open issues in [Issues](https://github.com/shinzo-labs/shinzo/issues) to participate in discussion or ask to be assigned directly to it. If you would like to suggest a feature that is not already captured in the Issues section, please open a new Issue ticket. 
+If you would like to contribute code to the codebase, you may review the open issues in [Issues](https://github.com/shinzo-labs/shinzo-ts/issues) to participate in discussion or ask to be assigned directly to it. If you would like to suggest a feature that is not already captured in the Issues section, please open a new Issue ticket. 
 
 Once you have been assigned an issue, the steps to contribute are:
 1. Create a fork version of the repo.
