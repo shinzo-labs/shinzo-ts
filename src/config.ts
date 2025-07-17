@@ -7,8 +7,7 @@ export const DEFAULT_CONFIG: Partial<TelemetryConfig>  = {
   exporterType: 'otlp-http',
   enableMetrics: true,
   enableTracing: true,
-  batchTimeout: 2000, // ms
-  maxBatchSize: 100,
+  batchTimeoutMs: 2000, // ms
   dataProcessors: []
 }
 
@@ -23,8 +22,13 @@ export class ConfigValidator {
 
     if (
       config.metricExportIntervalMs !== undefined &&
-      config.metricExportIntervalMs < 1000
-    ) throw new Error('metricExportIntervalMs must be at least 1000ms')
+      config.metricExportIntervalMs <= 0
+    ) throw new Error('metricExportIntervalMs must be >0')
+
+    if (
+      config.batchTimeoutMs !== undefined &&
+      config.batchTimeoutMs <= 0
+    ) throw new Error('batchTimeout must be >=0')
 
     if (config.exporterAuth) this.validateAuthConfig(config.exporterAuth)
   }

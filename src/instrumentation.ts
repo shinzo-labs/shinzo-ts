@@ -32,7 +32,7 @@ export class McpServerInstrumentation {
     if (!this.server.tool || typeof this.server.tool !== 'function') {
       return
     }
-    
+  
     const originalTool = this.server.tool.bind(this.server)
 
     this.server.tool = (name: string, ...rest: any[]): RegisteredTool => {

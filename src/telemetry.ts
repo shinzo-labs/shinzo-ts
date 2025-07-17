@@ -36,7 +36,7 @@ export class TelemetryManager implements ObservabilityInstance {
       [ATTR_SERVICE_VERSION]: this.config.serverVersion,
       'mcp.session.id': this.sessionId,
     })
-  
+
     const sdkConfig: Partial<NodeSDKConfiguration> = {
       resource,
       resourceDetectors: [
@@ -118,7 +118,7 @@ export class TelemetryManager implements ObservabilityInstance {
     return new PeriodicExportingMetricReader({
       exporter: metricExporter,
       exportIntervalMillis: this.config.metricExportIntervalMs || DEFAULT_CONFIG.metricExportIntervalMs,
-      exportTimeoutMillis: DEFAULT_CONFIG.batchTimeout,
+      exportTimeoutMillis: this.config.batchTimeoutMs || DEFAULT_CONFIG.batchTimeoutMs,
     })
   }
 

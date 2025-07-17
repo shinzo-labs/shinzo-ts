@@ -131,15 +131,15 @@ describe('McpServerInstrumentation', () => {
     it('should handle slow operations', async () => {
       // Use real timers for this test
       jest.useRealTimers()
-    
+  
       createTestTools(mockServer)
       instrumentation.instrument()
 
       // Test functionality rather than actual timing to avoid flaky tests
       const result = await mockServer.callTool('slow-operation', { delay: 5 })
-    
+  
       expect(result).toEqual({ completed: true, delay: 5 })
-    
+  
       // Restore fake timers
       jest.useFakeTimers()
     })
@@ -196,7 +196,7 @@ describe('McpServerInstrumentation', () => {
     it('should extract parameter attributes correctly', () => {
       // Access the private method via reflection for testing
       const getParamsSpanAttributes = (instrumentation as any).getParamsSpanAttributes
-      
+    
       const params = {
         operation: 'add',
         a: 5,

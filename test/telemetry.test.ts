@@ -138,14 +138,14 @@ describe('TelemetryManager', () => {
         description: 'Test metric',
         unit: 'ms'
       })
-      
+    
       expect(typeof histogramFn).toBe('function')
       expect(() => histogramFn(100, { 'test.attribute': 'value' })).not.toThrow()
     })
 
     it('should create counter function', () => {
       const counterFn = telemetryManager.getIncrementCounter('test-counter')
-      
+    
       expect(typeof counterFn).toBe('function')
       expect(() => counterFn(1, { 'test.attribute': 'value' })).not.toThrow()
     })

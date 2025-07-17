@@ -19,8 +19,7 @@ export interface TelemetryConfig {
   exporterType?: 'otlp-http' | 'otlp-grpc' | 'console'
   enableMetrics?: boolean
   enableTracing?: boolean
-  batchTimeout?: number
-  maxBatchSize?: number
+  batchTimeoutMs?: number
   PIISanitizer?: PIISanitizer
 }
 
