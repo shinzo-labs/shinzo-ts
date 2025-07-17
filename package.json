@@ -1,7 +1,7 @@
 {
   "name": "shinzo",
   "version": "1.0.0",
-  "description": "Fair-code analytics stack for MCP servers.",
+  "description": "Auto-instrumentation for OpenTelemetry data on MCP servers.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -61,8 +61,14 @@
     "@modelcontextprotocol/sdk": "^1.15.1"
   },
   "files": [
-    "dist/**/*",
-    "README.md"
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "CONTRIBUTOR_LICENSE_AGREEMENT.md",
+    "LICENSE.md",
+    "LICENSE_EE.md",
+    "README.md",
+    "SECURITY.md",
+    "dist/**/*"
   ],
   "packageManager": "pnpm@10.12.1",
   "engines": {
