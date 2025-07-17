@@ -9,6 +9,13 @@
     "pnpm": ">=10.2.1"
   },
   "packageManager": "pnpm@10.12.1",
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "*": "*"
+      }
+    }
+  },
   "scripts": {
     "build": "pnpm -r run build",
     "dev": "pnpm -r --parallel run dev",

@@ -112,8 +112,7 @@ class TestRunner {
     args.push(
       '--detectOpenHandles',
       '--forceExit',
-      '--runInBand', // Run tests serially to avoid conflicts
-      '--maxWorkers=1'
+      '--runInBand' // Run tests serially to avoid conflicts
     )
 
     return new Promise((resolve) => {
