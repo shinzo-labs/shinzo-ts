@@ -3,13 +3,54 @@ import { MockMcpServer, createTestTools, createTestResources, createTestPrompts 
 import { TelemetryConfig, ObservabilityInstance } from '../src/types'
 
 // Mock OpenTelemetry modules to avoid real network calls
-jest.mock('@opentelemetry/sdk-node')
-jest.mock('@opentelemetry/resources')
-jest.mock('@opentelemetry/exporter-trace-otlp-http')
-jest.mock('@opentelemetry/exporter-metrics-otlp-http')
-jest.mock('@opentelemetry/sdk-trace-base')
-jest.mock('@opentelemetry/sdk-metrics')
-jest.mock('@opentelemetry/api')
+jest.mock('@opentelemetry/sdk-node', () => ({
+  NodeSDK: jest.fn().mockImplementation(() => ({
+    start: jest.fn(),
+    shutdown: jest.fn().mockResolvedValue(undefined)
+  }))
+}))
+jest.mock('@opentelemetry/resources', () => ({
+  resourceFromAttributes: jest.fn().mockReturnValue({}),
+}))
+jest.mock('@opentelemetry/sdk-trace-base', () => ({
+  TraceIdRatioBasedSampler: jest.fn().mockImplementation(() => ({})),
+  ConsoleSpanExporter: jest.fn().mockImplementation(() => ({}))
+}))
+jest.mock('@opentelemetry/exporter-trace-otlp-http', () => ({
+  OTLPTraceExporter: jest.fn().mockImplementation(() => ({}))
+}))
+jest.mock('@opentelemetry/exporter-metrics-otlp-http', () => ({
+  OTLPMetricExporter: jest.fn().mockImplementation(() => ({}))
+}))
+jest.mock('@opentelemetry/sdk-metrics', () => ({
+  PeriodicExportingMetricReader: jest.fn().mockImplementation(() => ({}))
+}))
+jest.mock('@opentelemetry/api', () => ({
+  trace: {
+    getTracer: jest.fn().mockReturnValue({
+      startSpan: jest.fn().mockReturnValue({
+        setAttributes: jest.fn(),
+        setStatus: jest.fn(),
+        end: jest.fn()
+      }),
+      startActiveSpan: jest.fn().mockImplementation((name, options, fn) => fn({
+        setAttributes: jest.fn(),
+        setStatus: jest.fn(),
+        end: jest.fn()
+      }))
+    })
+  },
+  metrics: {
+    getMeter: jest.fn().mockReturnValue({
+      createHistogram: jest.fn().mockReturnValue({
+        record: jest.fn()
+      }),
+      createCounter: jest.fn().mockReturnValue({
+        add: jest.fn()
+      })
+    })
+  }
+}))
 
 describe('Integration Tests', () => {
   let mockServer: MockMcpServer
@@ -22,8 +63,8 @@ describe('Integration Tests', () => {
 
     // Setup mock configuration
     mockConfig = {
-      serviceName: 'test-mcp-service',
-      serviceVersion: '1.0.0',
+      serverName: 'test-mcp-service',
+      serverVersion: '1.0.0',
       exporterEndpoint: 'http://localhost:4318/v1/traces',
       exporterType: 'console',
       enableMetrics: true,
@@ -80,14 +121,14 @@ describe('Integration Tests', () => {
 
   describe('Full Integration Flow', () => {
     it('should initialize observability and instrument MCP server', () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       expect(observabilityInstance).toBeDefined()
       expect(observabilityInstance.shutdown).toBeDefined()
     })
 
     it('should execute tool calls with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       const result = await mockServer.callTool('calculator', {
         operation: 'add',
@@ -99,7 +140,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle failed tool calls with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       await expect(mockServer.callTool('failing-tool', {
         errorMessage: 'Custom error message'
@@ -107,7 +148,7 @@ describe('Integration Tests', () => {
     })
 
     it('should execute resource calls with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       const result = await mockServer.callResource('file://test.txt')
 
@@ -119,7 +160,7 @@ describe('Integration Tests', () => {
     })
 
     it('should execute prompt calls with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       const result = await mockServer.callPrompt('greeting', { name: 'Integration Test' })
 
@@ -134,7 +175,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle multiple concurrent operations', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       const promises = [
         mockServer.callTool('calculator', { operation: 'add', a: 1, b: 2 }),
@@ -153,7 +194,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle graceful shutdown', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       await mockServer.callTool('calculator', { operation: 'add', a: 1, b: 2 })
 
@@ -162,14 +203,14 @@ describe('Integration Tests', () => {
 
     it('should validate configuration before initialization', () => {
       const invalidConfig = {
-        serviceName: '',
-        serviceVersion: '1.0.0',
-        exporterEndpoint: 'http://localhost:4318'
+        serverName: 'test',
+        serverVersion: '1.0.0'
+        // Missing exporterEndpoint
       } as TelemetryConfig
 
       expect(() => {
-        initializeAgentObservability(mockServer, invalidConfig)
-      }).toThrow('serviceName is required')
+        initializeAgentObservability(mockServer as any, invalidConfig)
+      }).toThrow('exporterEndpoint is required')
     })
 
     it('should handle server without event support', async () => {
@@ -189,7 +230,7 @@ describe('Integration Tests', () => {
 
   describe('Performance Tests', () => {
     it('should maintain performance with instrumentation', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       const iterations = 10 // Reduced for faster tests
       const startTime = Date.now()
@@ -210,7 +251,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle high frequency operations', async () => {
-      observabilityInstance = initializeAgentObservability(mockServer, mockConfig)
+      observabilityInstance = initializeAgentObservability(mockServer as any, mockConfig)
 
       const promises = []
       for (let i = 0; i < 20; i++) {
@@ -238,7 +279,7 @@ describe('Integration Tests', () => {
       }
 
       expect(() => {
-        initializeAgentObservability(mockServer, configWithFailingProcessor)
+        initializeAgentObservability(mockServer as any, configWithFailingProcessor)
       }).not.toThrow()
     })
 
@@ -257,7 +298,7 @@ describe('Integration Tests', () => {
       // This test verifies the system handles errors gracefully
       // In a real scenario, OpenTelemetry errors would be caught and handled
       expect(() => {
-        initializeAgentObservability(mockServer, mockConfig)
+        initializeAgentObservability(mockServer as any, mockConfig)
       }).not.toThrow() // Should not throw due to our mocks
     })
   })

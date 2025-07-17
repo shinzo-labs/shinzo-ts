@@ -1,6 +1,4 @@
-import { McpServerLike } from '../../src/types'
-
-export class MockMcpServer implements McpServerLike {
+export class MockMcpServer {
   name: string
   version: string
   _tools: Map<string, any>

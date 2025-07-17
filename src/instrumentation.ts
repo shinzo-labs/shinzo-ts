@@ -29,6 +29,10 @@ export class McpServerInstrumentation {
   }
 
   private instrumentTools(): void {
+    if (!this.server.tool || typeof this.server.tool !== 'function') {
+      return
+    }
+    
     const originalTool = this.server.tool.bind(this.server)
 
     this.server.tool = (name: string, ...rest: any[]): RegisteredTool => {
@@ -98,7 +102,16 @@ export class McpServerInstrumentation {
       'mcp.tool.name': name
     }
 
-    const counter = this.telemetryManager.meter.createCounter(`${method} ${name}`)
+    const recordHistogram = this.telemetryManager.getHistogram('mcp.server.operation.duration', {
+      description: 'MCP request or notification duration as observed on the receiver from the time it was received until the result or ack is sent.',
+      unit: 'ms'
+    })
+
+    const incrementCounter = this.telemetryManager.getIncrementCounter(`${method} ${name}`, {
+      description: 'MCP request or notification count as observed on the receiver.',
+      unit: 'calls'
+    })
+
     return async (params: any) => {
       const spanAttributes = {
         ...baseAttributes,
@@ -109,7 +122,7 @@ export class McpServerInstrumentation {
       }
 
       return this.telemetryManager.startActiveSpan(`${method} ${name}`, { attributes: spanAttributes }, async (span: Span) => {
-        counter.add(1)
+        incrementCounter(1)
 
         let result: any
         let error: any
@@ -128,7 +141,7 @@ export class McpServerInstrumentation {
         const endTime = Date.now()
         const duration = endTime - startTime
 
-        this.telemetryManager.recordMetric('mcp.server.operation.duration', duration, {
+        recordHistogram(duration, {
           ...baseAttributes,
           'error.type': error ? (error as Error).name : undefined
         })

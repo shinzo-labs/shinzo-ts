@@ -1,9 +1,9 @@
-import { Span } from '@opentelemetry/api'
+import { MetricOptions, Span } from '@opentelemetry/api'
 
 export interface TelemetryConfig {
-  exporterEndpoint: string
-  serviceName?: string
-  serviceVersion?: string
+  exporterEndpoint?: string
+  serverName: string
+  serverVersion: string
   exporterAuth?: {
     type: 'bearer' | 'apiKey' | 'basic'
     token?: string
@@ -13,32 +13,13 @@ export interface TelemetryConfig {
   }
   samplingRate?: number
   metricExportIntervalMs?: number
-  enableUserConsent?: boolean
   enablePIISanitization?: boolean
-  dataProcessors?: DataProcessor[]
+  dataProcessors?: ((data: any) => any)[]
   exporterType?: 'otlp-http' | 'otlp-grpc' | 'console'
   enableMetrics?: boolean
   enableTracing?: boolean
   batchTimeout?: number
   maxBatchSize?: number
-}
-
-export interface DataProcessor {
-  (telemetryData: TelemetryData): TelemetryData
-}
-
-export interface TelemetryData {
-  timestamp: number
-  sessionId: string
-  requestId?: string
-  methodName: string
-  toolName?: string
-  promptName?: string
-  parameters?: Record<string, any>
-  result?: any
-  error?: Error
-  duration?: number
-  attributes?: Record<string, string | number | boolean>
 }
 
 export interface AuthConfig {
@@ -51,7 +32,8 @@ export interface AuthConfig {
 
 export interface ObservabilityInstance {
   startActiveSpan(name: string, attributes: Record<string, any>, fn: (span: Span) => void): any
-  recordMetric(name: string, value: number, attributes?: Record<string, any>): void
-  processTelemetryData(data: TelemetryData): TelemetryData
+  getHistogram(name: string, options: MetricOptions): (value: number, attributes?: Record<string, any>) => void
+  getIncrementCounter(name: string, options: MetricOptions): (value: number, attributes?: Record<string, any>) => void
+  processTelemetryAttributes(data: any): any
   shutdown(): Promise<void>
 }

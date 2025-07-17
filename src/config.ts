@@ -3,7 +3,6 @@ import { TelemetryConfig, AuthConfig } from './types'
 export const DEFAULT_CONFIG: Partial<TelemetryConfig>  = {
   samplingRate: 1.0, // 100% trace sampling by default
   metricExportIntervalMs: 5000, // ms
-  enableUserConsent: false,
   enablePIISanitization: true,
   exporterType: 'otlp-http',
   enableMetrics: true,
@@ -15,7 +14,7 @@ export const DEFAULT_CONFIG: Partial<TelemetryConfig>  = {
 
 export class ConfigValidator {
   static validate(config: TelemetryConfig): void {
-    if (!config.exporterEndpoint) throw new Error('exporterEndpoint is required')
+    if (!config.exporterEndpoint && config.exporterType !== 'console') throw new Error('exporterEndpoint is required')
 
     if (
       config.samplingRate !== undefined &&

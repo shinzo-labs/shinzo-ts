@@ -4,25 +4,21 @@ import { z } from "zod"
 
 import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js"
 
+const NAME = "my-mcp-server"
+const VERSION = "1.2.0"
+
 // Create MCP server
 const server = new McpServer({
-  name: "example-server",
-  version: "1.0.0",
+  name: NAME,
+  version: VERSION,
   description: "Example MCP server with telemetry"
 })
 
 // Configure telemetry with comprehensive options
 const telemetryConfig: TelemetryConfig = {
-  serviceName: "my-mcp-server",
-  serviceVersion: "1.2.0",
-  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/traces",
-  exporterAuth: process.env.OTEL_AUTH_TOKEN ? {
-    type: "bearer",
-    token: process.env.OTEL_AUTH_TOKEN
-  } : undefined,
-  samplingRate: parseFloat(process.env.OTEL_SAMPLING_RATE || "1.0"),
-  enableUserConsent: process.env.ENABLE_USER_CONSENT === "true",
-  enablePIISanitization: process.env.ENABLE_PII_SANITIZATION !== "false",
+  serverName: NAME,
+  serverVersion: VERSION,
+  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1", // /trace and /metrics are added automatically
   dataProcessors: [
     // Custom processor to remove sensitive data
     (telemetryData: any) => {

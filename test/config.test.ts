@@ -5,36 +5,36 @@ describe('ConfigValidator', () => {
   describe('validate', () => {
     it('should pass validation with valid config', () => {
       const config: TelemetryConfig = {
-        serviceName: 'test-service',
-        serviceVersion: '1.0.0',
+        serverName: 'test-service',
+        serverVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318'
       }
 
       expect(() => ConfigValidator.validate(config)).not.toThrow()
     })
 
-    it('should throw error when serviceName is missing', () => {
+    it('should not require serverName', () => {
       const config = {
-        serviceVersion: '1.0.0',
+        serverVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318'
       } as TelemetryConfig
 
-      expect(() => ConfigValidator.validate(config)).toThrow('serviceName is required')
+      expect(() => ConfigValidator.validate(config)).not.toThrow()
     })
 
-    it('should throw error when serviceVersion is missing', () => {
+    it('should not require serverVersion', () => {
       const config = {
-        serviceName: 'test-service',
+        serverName: 'test-service',
         exporterEndpoint: 'http://localhost:4318'
       } as TelemetryConfig
 
-      expect(() => ConfigValidator.validate(config)).toThrow('serviceVersion is required')
+      expect(() => ConfigValidator.validate(config)).not.toThrow()
     })
 
     it('should throw error when exporterEndpoint is missing', () => {
       const config = {
-        serviceName: 'test-service',
-        serviceVersion: '1.0.0'
+        serverName: 'test-service',
+        serverVersion: '1.0.0'
       } as TelemetryConfig
 
       expect(() => ConfigValidator.validate(config)).toThrow('exporterEndpoint is required')
@@ -42,8 +42,8 @@ describe('ConfigValidator', () => {
 
     it('should throw error when samplingRate is invalid', () => {
       const config: TelemetryConfig = {
-        serviceName: 'test-service',
-        serviceVersion: '1.0.0',
+        serverName: 'test-service',
+        serverVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318',
         samplingRate: 1.5
       }
@@ -53,8 +53,8 @@ describe('ConfigValidator', () => {
 
     it('should validate bearer auth correctly', () => {
       const config: TelemetryConfig = {
-        serviceName: 'test-service',
-        serviceVersion: '1.0.0',
+        serverName: 'test-service',
+        serverVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318',
         exporterAuth: {
           type: 'bearer',
@@ -67,8 +67,8 @@ describe('ConfigValidator', () => {
 
     it('should throw error when bearer token is missing', () => {
       const config: TelemetryConfig = {
-        serviceName: 'test-service',
-        serviceVersion: '1.0.0',
+        serverName: 'test-service',
+        serverVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318',
         exporterAuth: {
           type: 'bearer'
@@ -80,8 +80,8 @@ describe('ConfigValidator', () => {
 
     it('should validate apiKey auth correctly', () => {
       const config: TelemetryConfig = {
-        serviceName: 'test-service',
-        serviceVersion: '1.0.0',
+        serverName: 'test-service',
+        serverVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318',
         exporterAuth: {
           type: 'apiKey',
@@ -94,8 +94,8 @@ describe('ConfigValidator', () => {
 
     it('should validate basic auth correctly', () => {
       const config: TelemetryConfig = {
-        serviceName: 'test-service',
-        serviceVersion: '1.0.0',
+        serverName: 'test-service',
+        serverVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318',
         exporterAuth: {
           type: 'basic',

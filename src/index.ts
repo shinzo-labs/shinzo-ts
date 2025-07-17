@@ -1,8 +1,8 @@
 import { TelemetryManager } from './telemetry'
 import { McpServerInstrumentation } from './instrumentation'
 import { ConfigValidator } from './config'
-import { TelemetryConfig, TelemetryData, ObservabilityInstance } from './types'
-import { Span } from '@opentelemetry/api'
+import { TelemetryConfig, ObservabilityInstance } from './types'
+import { MetricOptions, Span } from '@opentelemetry/api'
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 
@@ -12,8 +12,7 @@ export function initializeAgentObservability(
 ): ObservabilityInstance {
   ConfigValidator.validate(config)
 
-  const telemetryManager = new TelemetryManager(server, config)
-
+  const telemetryManager = new TelemetryManager(config)
   const instrumentation = new McpServerInstrumentation(server, telemetryManager)
   instrumentation.instrument()
 
@@ -21,11 +20,14 @@ export function initializeAgentObservability(
     startActiveSpan: (name: string, attributes: Record<string, any>, fn: (span: Span) => void) => {
       return telemetryManager.startActiveSpan(name, attributes, fn)
     },
-    recordMetric: (name: string, value: number, attributes?: Record<string, any>) => {
-      telemetryManager.recordMetric(name, value, attributes)
+    getHistogram: (name: string, options: MetricOptions) => {
+      return telemetryManager.getHistogram(name, options)
     },
-    processTelemetryData: (data: TelemetryData) => {
-      return telemetryManager.processTelemetryData(data)
+    getIncrementCounter: (name: string, options: MetricOptions) => {
+      return telemetryManager.getIncrementCounter(name, options)
+    },
+    processTelemetryAttributes: (data: any) => {
+      return telemetryManager.processTelemetryAttributes(data)
     },
     shutdown: async () => {
       await telemetryManager.shutdown()
@@ -39,8 +41,6 @@ export { ConfigValidator } from './config'
 
 export type {
   AuthConfig,
-  DataProcessor,
   ObservabilityInstance,
   TelemetryConfig,
-  TelemetryData
 } from './types'

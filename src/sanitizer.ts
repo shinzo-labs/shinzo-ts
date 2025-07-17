@@ -1,5 +1,3 @@
-import { TelemetryData } from './types'
-
 export class PIISanitizer {
   private readonly piiPatterns: RegExp[]
   private readonly enabled: boolean
@@ -17,7 +15,7 @@ export class PIISanitizer {
     ]
   }
 
-  public sanitize(data: TelemetryData): TelemetryData {
+  public sanitize(data: Record<string, any>): Record<string, any> {
     if (!this.enabled) return data
 
     const sanitizedData = { ...data }
@@ -41,7 +39,7 @@ export class PIISanitizer {
     return sanitizedData
   }
 
-  private sanitizeObject(obj: Record<string, any>): Record<string, any> {
+  private sanitizeObject(obj: any): any {
     const sanitized: Record<string, any> = {}
 
     for (const [key, value] of Object.entries(obj)) {

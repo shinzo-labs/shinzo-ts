@@ -24,7 +24,6 @@ jest.doMock('../src/instrumentation', () => ({
 jest.doMock('../src/config', () => ({
   DEFAULT_CONFIG: {
     samplingRate: 1.0,
-    enableUserConsent: false,
     enablePIISanitization: true,
     exporterType: 'otlp-http',
     enableMetrics: true,
@@ -48,8 +47,8 @@ describe('Main Entry Point', () => {
   beforeEach(() => {
     mockServer = new MockMcpServer()
     mockConfig = {
-      serviceName: 'test-service',
-      serviceVersion: '1.0.0',
+      serverName: 'test-service',
+      serverVersion: '1.0.0',
       exporterEndpoint: 'http://localhost:4318'
     }
   })

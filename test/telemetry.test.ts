@@ -1,20 +1,64 @@
+// Mock OpenTelemetry modules
+jest.mock('@opentelemetry/sdk-node', () => ({
+  NodeSDK: jest.fn().mockImplementation(() => ({
+    start: jest.fn(),
+    shutdown: jest.fn().mockResolvedValue(undefined)
+  }))
+}))
+jest.mock('@opentelemetry/resources', () => ({
+  resourceFromAttributes: jest.fn().mockReturnValue({}),
+}))
+jest.mock('@opentelemetry/sdk-trace-base', () => ({
+  TraceIdRatioBasedSampler: jest.fn().mockImplementation(() => ({})),
+  ConsoleSpanExporter: jest.fn().mockImplementation(() => ({}))
+}))
+jest.mock('@opentelemetry/exporter-trace-otlp-http', () => ({
+  OTLPTraceExporter: jest.fn().mockImplementation(() => ({}))
+}))
+jest.mock('@opentelemetry/exporter-metrics-otlp-http', () => ({
+  OTLPMetricExporter: jest.fn().mockImplementation(() => ({}))
+}))
+jest.mock('@opentelemetry/sdk-metrics', () => ({
+  PeriodicExportingMetricReader: jest.fn().mockImplementation(() => ({}))
+}))
+jest.mock('@opentelemetry/api', () => ({
+  trace: {
+    getTracer: jest.fn().mockReturnValue({
+      startSpan: jest.fn().mockReturnValue({
+        setAttributes: jest.fn(),
+        setStatus: jest.fn(),
+        end: jest.fn()
+      }),
+      startActiveSpan: jest.fn().mockImplementation((name, options, fn) => fn({
+        setAttributes: jest.fn(),
+        setStatus: jest.fn(),
+        end: jest.fn()
+      }))
+    })
+  },
+  metrics: {
+    getMeter: jest.fn().mockReturnValue({
+      createHistogram: jest.fn().mockReturnValue({
+        record: jest.fn()
+      }),
+      createCounter: jest.fn().mockReturnValue({
+        add: jest.fn()
+      })
+    })
+  }
+}))
+
 import { TelemetryManager } from '../src/telemetry'
-import { TelemetryConfig, TelemetryData, McpServerLike } from '../src/types'
+import { TelemetryConfig } from '../src/types'
 
 describe('TelemetryManager', () => {
   let telemetryManager: TelemetryManager
   let mockConfig: TelemetryConfig
-  let mockServer: McpServerLike
-
   beforeEach(() => {
-    mockServer = {
-      name: 'test-server',
-      version: '1.0.0'
-    }
 
     mockConfig = {
-      serviceName: 'test-service',
-      serviceVersion: '1.0.0',
+      serverName: 'test-service',
+      serverVersion: '1.0.0',
       exporterEndpoint: 'http://localhost:4318',
       enableTracing: true,
       enableMetrics: true,
@@ -22,7 +66,7 @@ describe('TelemetryManager', () => {
       samplingRate: 1.0
     }
 
-    telemetryManager = new TelemetryManager(mockServer, mockConfig)
+    telemetryManager = new TelemetryManager(mockConfig)
   })
 
   afterEach(() => {
@@ -34,13 +78,14 @@ describe('TelemetryManager', () => {
       // Test functional behavior instead of mock calls
       expect(telemetryManager).toBeDefined()
       expect(typeof telemetryManager.createSpan).toBe('function')
-      expect(typeof telemetryManager.recordMetric).toBe('function')
+      expect(typeof telemetryManager.getHistogram).toBe('function')
+      expect(typeof telemetryManager.getIncrementCounter).toBe('function')
       expect(typeof telemetryManager.shutdown).toBe('function')
     })
 
     it('should generate unique session ID', () => {
-      const manager1 = new TelemetryManager(mockServer, mockConfig)
-      const manager2 = new TelemetryManager(mockServer, mockConfig)
+      const manager1 = new TelemetryManager(mockConfig)
+      const manager2 = new TelemetryManager(mockConfig)
 
       // Access private sessionId via any casting for testing
       const sessionId1 = (manager1 as any).sessionId
@@ -52,12 +97,12 @@ describe('TelemetryManager', () => {
 
     it('should merge default config with user config', () => {
       const partialConfig: TelemetryConfig = {
-        serviceName: 'test',
-        serviceVersion: '1.0.0',
+        serverName: 'test',
+        serverVersion: '1.0.0',
         exporterEndpoint: 'http://localhost:4318'
       }
 
-      const manager = new TelemetryManager(mockServer, partialConfig)
+      const manager = new TelemetryManager(partialConfig)
       const config = (manager as any).config
 
       expect(config.enablePIISanitization).toBe(true)
@@ -87,27 +132,36 @@ describe('TelemetryManager', () => {
     })
   })
 
-  describe('recordMetric', () => {
-    it('should record metrics with correct attributes', () => {
-      // Test that recordMetric doesn't throw and executes successfully
-      expect(() => {
-        telemetryManager.recordMetric('test-metric', 100, {
-          'test.attribute': 'value'
-        })
-      }).not.toThrow()
+  describe('getHistogram and getIncrementCounter', () => {
+    it('should create histogram function', () => {
+      const histogramFn = telemetryManager.getHistogram('test-metric', {
+        description: 'Test metric',
+        unit: 'ms'
+      })
+      
+      expect(typeof histogramFn).toBe('function')
+      expect(() => histogramFn(100, { 'test.attribute': 'value' })).not.toThrow()
+    })
+
+    it('should create counter function', () => {
+      const counterFn = telemetryManager.getIncrementCounter('test-counter')
+      
+      expect(typeof counterFn).toBe('function')
+      expect(() => counterFn(1, { 'test.attribute': 'value' })).not.toThrow()
     })
 
     it('should handle uninitialized manager gracefully', () => {
       const uninitializedManager = Object.create(TelemetryManager.prototype)
       uninitializedManager.isInitialized = false
 
-      expect(() => uninitializedManager.recordMetric('test', 100)).not.toThrow()
+      expect(() => uninitializedManager.getHistogram('test', { description: 'test' })).toThrow('Telemetry not initialized')
+      expect(() => uninitializedManager.getIncrementCounter('test')).toThrow('Telemetry not initialized')
     })
   })
 
-  describe('processTelemetryData', () => {
+  describe('processTelemetryAttributes', () => {
     it('should process telemetry data with PII sanitization', () => {
-      const testData: TelemetryData = {
+      const testData: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test-method',
@@ -117,7 +171,7 @@ describe('TelemetryManager', () => {
         }
       }
 
-      const processed = telemetryManager.processTelemetryData(testData)
+      const processed = telemetryManager.processTelemetryAttributes(testData)
 
       expect(processed.parameters?.email).toBe('[REDACTED]')
       expect(processed.parameters?.name).toBe('John Doe')
@@ -134,15 +188,15 @@ describe('TelemetryManager', () => {
         dataProcessors: [processor]
       }
 
-      const manager = new TelemetryManager(mockServer, configWithProcessor)
+      const manager = new TelemetryManager(configWithProcessor)
 
-      const testData: TelemetryData = {
+      const testData: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test-method'
       }
 
-      const processed = manager.processTelemetryData(testData)
+      const processed = manager.processTelemetryAttributes(testData)
 
       expect(processor).toHaveBeenCalledWith(expect.objectContaining(testData))
       expect((processed as any).processed).toBe(true)
@@ -154,9 +208,9 @@ describe('TelemetryManager', () => {
         enablePIISanitization: false
       }
 
-      const manager = new TelemetryManager(mockServer, configWithoutPII)
+      const manager = new TelemetryManager(configWithoutPII)
 
-      const testData: TelemetryData = {
+      const testData: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test-method',
@@ -165,7 +219,7 @@ describe('TelemetryManager', () => {
         }
       }
 
-      const processed = manager.processTelemetryData(testData)
+      const processed = manager.processTelemetryAttributes(testData)
 
       expect(processed.parameters?.email).toBe('test@example.com')
     })
@@ -183,6 +237,7 @@ describe('TelemetryManager', () => {
     it('should handle shutdown when SDK is not initialized', async () => {
       const manager = Object.create(TelemetryManager.prototype)
       manager.sdk = undefined
+      manager.config = { enableMetrics: false }
 
       await expect(manager.shutdown()).resolves.not.toThrow()
     })

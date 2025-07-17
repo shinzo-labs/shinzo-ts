@@ -5,11 +5,14 @@ import { z } from "zod"
 
 import { initializeAgentObservability, TelemetryConfig } from "../dist/index.js"
 
+const NAME = "console-demo-server"
+const VERSION = "1.0.0"
+
 // Create MCP server
 const server = new Server(
   {
-    name: "console-demo-server",
-    version: "1.0.0",
+    name: NAME,
+    version: VERSION,
   },
   {
     capabilities: {
@@ -20,9 +23,8 @@ const server = new Server(
 
 // Configuration for console output (useful for development/testing)
 const telemetryConfig: TelemetryConfig = {
-  serviceName: "console-demo-server",
-  serviceVersion: "1.0.0",
-  exporterEndpoint: "console://localhost", // Not used for console exporter
+  serverName: NAME,
+  serverVersion: VERSION,
   exporterType: "console", // Output to console instead of remote endpoint
   samplingRate: 1.0, // Sample 100% for demo
   enablePIISanitization: true,

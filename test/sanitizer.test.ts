@@ -1,5 +1,4 @@
 import { PIISanitizer } from '../src/sanitizer'
-import { TelemetryData } from '../src/types'
 
 describe('PIISanitizer', () => {
   let sanitizer: PIISanitizer
@@ -10,7 +9,7 @@ describe('PIISanitizer', () => {
 
   describe('sanitize', () => {
     it('should sanitize credit card numbers', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -24,7 +23,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize SSN', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -38,7 +37,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize email addresses', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -52,7 +51,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize phone numbers', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -66,7 +65,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize API keys and secrets', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -80,7 +79,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize long tokens', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -94,7 +93,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize auth headers', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -108,7 +107,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize sensitive keys', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -126,7 +125,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize nested objects', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -144,7 +143,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize arrays', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -158,7 +157,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should sanitize error messages', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -171,7 +170,7 @@ describe('PIISanitizer', () => {
 
     it('should not sanitize when disabled', () => {
       const disabledSanitizer = new PIISanitizer(false)
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',
@@ -185,7 +184,7 @@ describe('PIISanitizer', () => {
     })
 
     it('should preserve non-sensitive data', () => {
-      const data: TelemetryData = {
+      const data: any = {
         timestamp: Date.now(),
         sessionId: 'test-session',
         methodName: 'test',

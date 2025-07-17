@@ -1,5 +1,5 @@
-import { trace, metrics, Span } from '@opentelemetry/api'
-import { NodeSDK } from '@opentelemetry/sdk-node'
+import { trace, metrics, Span, Tracer, Meter, MetricOptions } from '@opentelemetry/api'
+import { NodeSDK, NodeSDKConfiguration } from '@opentelemetry/sdk-node'
 import { Resource } from '@opentelemetry/resources'
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions'
 import { TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base'
@@ -7,53 +7,47 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http'
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base'
-import { TelemetryConfig, TelemetryData, ObservabilityInstance } from './types'
+import { TelemetryConfig, ObservabilityInstance } from './types'
 import { DEFAULT_CONFIG } from './config'
 import { PIISanitizer } from './sanitizer'
 import { generateUuid } from './utils'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 
 export class TelemetryManager implements ObservabilityInstance {
   private sdk: NodeSDK | undefined
   private config: TelemetryConfig
-  public tracer: any
-  public meter: any
+  public tracer: Tracer
+  public meter: Meter
   public piiSanitizer: PIISanitizer
   private sessionId: string
   private sessionStart: number
   private isInitialized: boolean = false
-  private serverInfo: { name: string, version: string }
 
-  constructor(server: McpServer, config: TelemetryConfig) {
+  constructor(config: TelemetryConfig) {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = generateUuid()
     this.sessionStart = Date.now()
     this.piiSanitizer = new PIISanitizer(this.config.enablePIISanitization || false)
-    this.serverInfo = { name: "Shinzo Test Server", version: "1.0.0" }
-    this.initializeSDK(server)
-  }
 
-  private initializeSDK(server: McpServer): void {
     const resource = new Resource({
-      [ATTR_SERVICE_NAME]: this.serverInfo.name,
-      [ATTR_SERVICE_VERSION]: this.serverInfo.version,
+      [ATTR_SERVICE_NAME]: this.config.serverName,
+      [ATTR_SERVICE_VERSION]: this.config.serverVersion,
       'mcp.session.id': this.sessionId,
     })
-
-    const traceExporter = this.createTraceExporter()
-    const metricReader = this.createMetricReader()
   
-    const sdkConfig: any = {
-      resource,
-      traceExporter: this.config.enableTracing ? traceExporter : undefined,
+    const sdkConfig: Partial<NodeSDKConfiguration> = { resource }
+
+    if (this.config.enableTracing) {
+      sdkConfig.traceExporter = this.createTraceExporter()
+
+      if (this.config.samplingRate !== undefined) {
+        sdkConfig.sampler = new TraceIdRatioBasedSampler(this.config.samplingRate)
+      }
     }
 
-    if (this.config.enableTracing && this.config.samplingRate !== undefined) {
-      sdkConfig.sampler = new TraceIdRatioBasedSampler(this.config.samplingRate || DEFAULT_CONFIG.samplingRate)
-    }
+    const metricReader = this.createMetricReader()
 
     if (this.config.enableMetrics && metricReader) {
-      sdkConfig.metricReader = metricReader
+      sdkConfig.metricReader = metricReader as any // https://github.com/open-telemetry/opentelemetry-js/issues/3944
     }
 
     this.sdk = new NodeSDK(sdkConfig)
@@ -61,38 +55,8 @@ export class TelemetryManager implements ObservabilityInstance {
     this.sdk.start()
     this.isInitialized = true
 
-    this.tracer = trace.getTracer(this.serverInfo.name, this.serverInfo.version)
-    this.meter = metrics.getMeter(this.serverInfo.name, this.serverInfo.version)
-  }
-
-  private createTraceExporter() {
-    if (this.config.exporterType === 'console') {
-      return new ConsoleSpanExporter()
-    }
-
-    const headers = this.getOTLPHeaders()
-    return new OTLPTraceExporter({
-      url: this.config.exporterEndpoint,
-      headers
-    })
-  }
-
-  private createMetricReader() {
-    if (this.config.exporterType === 'console') {
-      return undefined // No metric reader for console output
-    }
-
-    const headers = this.getOTLPHeaders()
-    const metricExporter = new OTLPMetricExporter({
-      url: this.config.exporterEndpoint.replace('/traces', '/metrics'),
-      headers
-    })
-
-    return new PeriodicExportingMetricReader({
-      exporter: metricExporter,
-      exportIntervalMillis: this.config.metricExportIntervalMs || DEFAULT_CONFIG.metricExportIntervalMs,
-      exportTimeoutMillis: DEFAULT_CONFIG.batchTimeout,
-    })
+    this.tracer = trace.getTracer(this.config.serverName, this.config.serverVersion)
+    this.meter = metrics.getMeter(this.config.serverName, this.config.serverVersion)
   }
 
   private getOTLPHeaders() {
@@ -115,42 +79,79 @@ export class TelemetryManager implements ObservabilityInstance {
     return headers
   }
 
+  private createTraceExporter() {
+    if (this.config.exporterType === 'console') return new ConsoleSpanExporter()
+
+    const headers = this.getOTLPHeaders()
+    const url = this.config.exporterEndpoint +
+      (this.config.exporterEndpoint?.endsWith('/') ? '' : '/') +
+      'traces'
+
+    return new OTLPTraceExporter({ url, headers })
+  }
+
+  private createMetricReader() {
+    if (this.config.exporterType === 'console') return undefined // No metric reader for console output
+
+    const headers = this.getOTLPHeaders()
+    const url = this.config.exporterEndpoint +
+      (this.config.exporterEndpoint?.endsWith('/') ? '' : '/') +
+      'metrics'
+
+    const metricExporter = new OTLPMetricExporter({ url, headers })
+
+    return new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: this.config.metricExportIntervalMs || DEFAULT_CONFIG.metricExportIntervalMs,
+      exportTimeoutMillis: DEFAULT_CONFIG.batchTimeout,
+    })
+  }
+
   public startActiveSpan(name: string, attributes: Record<string, any>, fn: (span: Span) => void): ReturnType<typeof this.tracer.startActiveSpan> {
     if (!this.isInitialized) throw new Error('Telemetry not initialized')
-
-    const newAttributes = { 'mcp.session.id': this.sessionId, ...attributes }
-
-    return this.tracer.startActiveSpan(name, { attributes: newAttributes }, fn)
+    const processedAttributes = this.processTelemetryAttributesWithSessionId(attributes)
+    return this.tracer.startActiveSpan(name, { attributes: processedAttributes }, fn)
   }
 
   public createSpan(name: string, attributes: Record<string, any>): Span {
     if (!this.isInitialized) throw new Error('Telemetry not initialized')
-    return this.tracer.startSpan(name, { attributes: { 'mcp.session.id': this.sessionId, ...attributes } })
+    const processedAttributes = this.processTelemetryAttributesWithSessionId(attributes)
+    return this.tracer.startSpan(name, { attributes: processedAttributes })
   }
 
-  public recordMetric(name: string, value: number, attributes?: Record<string, any>): void {
+  public getHistogram(name: string, options: MetricOptions): (value: number, attributes?: Record<string, any>) => void {
     if (!this.isInitialized) throw new Error('Telemetry not initialized')
+    const histogram = this.meter.createHistogram(name, options)
+    return (value: number, attributes?: Record<string, any>) => {
+      const processedAttributes = this.processTelemetryAttributesWithSessionId(attributes)
+      histogram.record(value, processedAttributes)
+    }
+  }
 
-    try {
-      const histogram = this.meter.createHistogram(name, {
-        description: 'MCP request or notification duration as observed on the receiver from the time it was received until the result or ack is sent.',
-        unit: 's'
-      })
-
-      histogram.record(value, { 'mcp.session.id': this.sessionId, ...attributes })
-    } catch (error) {
-      console.warn('Failed to record metric:', error)
+  public getIncrementCounter(name: string, options: MetricOptions): (value: number, attributes?: Record<string, any>) => void {
+    if (!this.isInitialized) throw new Error('Telemetry not initialized')
+    const counter = this.meter.createCounter(name, options)
+    return (value: number, attributes?: Record<string, any>) => {
+      const processedAttributes = this.processTelemetryAttributesWithSessionId(attributes)
+      counter.add(value, processedAttributes)
     }
   }
 
   private recordSessionDuration(): void {
-    const sessionDuration = Date.now() - this.sessionStart
-    this.meter.recordMetric('mcp.server.session.duration', sessionDuration, {
-      'mcp.session.id': this.sessionId
-    })
+    if (this.config.enableMetrics) {
+      const recordHistogram = this.getHistogram('mcp.server.session.duration', {
+        description: 'MCP server session duration as observed on the receiver from the time it was received until the session is closed.',
+        unit: 's'
+      })
+      recordHistogram(Date.now() - this.sessionStart, { 'mcp.session.id': this.sessionId })
+    }
   }
 
-  public processTelemetryData(data: TelemetryData): TelemetryData {
+  private processTelemetryAttributesWithSessionId(data?: Record<string, any>): Record<string, any> {
+    return this.processTelemetryAttributes({ 'mcp.session.id': this.sessionId, ...(data || {}) })
+  }
+
+  public processTelemetryAttributes(data: Record<string, any>): Record<string, any> {
     let processedData = { ...data }
 
     if (this.config.enablePIISanitization) {

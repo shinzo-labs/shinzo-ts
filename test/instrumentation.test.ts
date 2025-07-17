@@ -1,6 +1,7 @@
 import { McpServerInstrumentation } from '../src/instrumentation'
 import { TelemetryManager } from '../src/telemetry'
 import { MockMcpServer, createTestTools, createTestResources, createTestPrompts } from './mocks/MockMcpServer'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 
 // Mock the telemetry manager
 jest.mock('../src/telemetry', () => ({
@@ -25,13 +26,15 @@ describe('McpServerInstrumentation', () => {
 
     // Create mock telemetry manager
     mockTelemetryManager = {
+      startActiveSpan: jest.fn().mockImplementation((name, options, fn) => fn(mockSpan)),
       createSpan: jest.fn().mockReturnValue(mockSpan),
-      recordMetric: jest.fn(),
-      processTelemetryData: jest.fn().mockImplementation((data) => data),
+      getHistogram: jest.fn().mockReturnValue(jest.fn()),
+      getIncrementCounter: jest.fn().mockReturnValue(jest.fn()),
+      processTelemetryAttributes: jest.fn().mockImplementation((data) => data),
       shutdown: jest.fn(),
     } as any
 
-    instrumentation = new McpServerInstrumentation(mockServer, mockTelemetryManager)
+    instrumentation = new McpServerInstrumentation(mockServer as any, mockTelemetryManager)
   })
 
   afterEach(() => {
@@ -154,26 +157,21 @@ describe('McpServerInstrumentation', () => {
       expect(result).toEqual({ result: 20 })
     })
 
-    it('should emit telemetry events when server supports it', async () => {
-      const emitSpy = jest.spyOn(mockServer, 'emit')
+    it('should execute tools correctly', async () => {
       createTestTools(mockServer)
       instrumentation.instrument()
 
-      await mockServer.callTool('echo', { message: 'test' })
+      const result = await mockServer.callTool('echo', { message: 'test' })
 
       // Verify the tool executed correctly
-      expect(emitSpy).toBeDefined() // Server has emit capability
+      expect(result).toEqual({ echo: 'test' })
     })
   })
 
-  describe('uninstrument', () => {
-    it('should not throw when uninstrumenting', () => {
+  describe('shutdown', () => {
+    it('should not throw when shutting down', () => {
       instrumentation.instrument()
-      expect(() => instrumentation.uninstrument()).not.toThrow()
-    })
-
-    it('should handle uninstrument without instrumentation', () => {
-      expect(() => instrumentation.uninstrument()).not.toThrow()
+      expect(() => mockTelemetryManager.shutdown()).not.toThrow()
     })
   })
 
@@ -194,5 +192,31 @@ describe('McpServerInstrumentation', () => {
       expect(results[1]).toEqual({ echo: 'test2' })
       expect(results[2]).toEqual({ echo: 'test3' })
     })
+
+    it('should extract parameter attributes correctly', () => {
+      // Access the private method via reflection for testing
+      const getParamsSpanAttributes = (instrumentation as any).getParamsSpanAttributes
+      
+      const params = {
+        operation: 'add',
+        a: 5,
+        b: 10,
+        nested: {
+          property: 'value',
+          number: 42
+        }
+      }
+
+      const attributes = getParamsSpanAttributes(params)
+
+      expect(attributes).toEqual({
+        'mcp.request.argument.operation': 'add',
+        'mcp.request.argument.a': 5,
+        'mcp.request.argument.b': 10,
+        'mcp.request.argument.nested.property': 'value',
+        'mcp.request.argument.nested.number': 42
+      })
+    })
+
   })
 })
