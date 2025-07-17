@@ -66,8 +66,8 @@ Add to your Claude Desktop configuration file:
       "command": "npx",
       "args": ["ts-node", "/path/to/shinzo/packages/instrumentation-mcp/examples/basic-usage.ts"],
       "env": {
-        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318/v1", // or other
-        "OTEL_AUTH_TOKEN": "my-auth-token
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318/v1",
+        "OTEL_AUTH_TOKEN": "my-auth-token"
       }
     }
   }
