@@ -100,6 +100,7 @@ The `TelemetryConfig` interface provides comprehensive configuration options for
 | `samplingRate` | `number` | ❌ | `1.0` | Trace sampling rate (0.0 to 1.0) |
 | `metricExportIntervalMs` | `number` | ❌ | `5000` | Metric export interval in milliseconds |
 | `enablePIISanitization` | `boolean` | ❌ | `true` | Enable automatic PII sanitization |
+| `enableArgumentCollection` | `boolean` | ❌ | `false` | Enable collection of tool arguments in traces |
 | `dataProcessors` | `((data: any) => any)[]` | ❌ | `[]` | Array of custom data processing functions |
 | `exporterType` | `'otlp-http' \| 'otlp-grpc' \| 'console'` | ❌ | `'otlp-http'` | Type of telemetry exporter |
 | `enableMetrics` | `boolean` | ❌ | `true` | Enable metrics collection |

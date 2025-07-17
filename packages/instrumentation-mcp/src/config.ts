@@ -4,6 +4,7 @@ export const DEFAULT_CONFIG: Partial<TelemetryConfig>  = {
   samplingRate: 1.0, // 100% trace sampling by default
   metricExportIntervalMs: 5000, // ms
   enablePIISanitization: true,
+  enableArgumentCollection: false, // disabled by default for user protection
   exporterType: 'otlp-http',
   enableMetrics: true,
   enableTracing: true,

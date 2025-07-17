@@ -256,4 +256,72 @@ describe('TelemetryManager', () => {
       }).not.toThrow()
     })
   })
+
+  describe('getArgumentAttributes', () => {
+    it('should return empty object when enableArgumentCollection is false', () => {
+      const configDisabled = { ...mockConfig, enableArgumentCollection: false }
+      const manager = new TelemetryManager(configDisabled)
+      
+      const params = { operation: 'add', a: 5, b: 10 }
+      const result = manager.getArgumentAttributes(params)
+      
+      expect(result).toEqual({})
+    })
+
+    it('should return flattened attributes when enableArgumentCollection is true', () => {
+      const configEnabled = { ...mockConfig, enableArgumentCollection: true }
+      const manager = new TelemetryManager(configEnabled)
+      
+      const params = { operation: 'add', a: 5, b: 10 }
+      const result = manager.getArgumentAttributes(params)
+      
+      expect(result).toEqual({
+        'mcp.request.argument.operation': 'add',
+        'mcp.request.argument.a': 5,
+        'mcp.request.argument.b': 10
+      })
+    })
+
+    it('should handle nested objects when enableArgumentCollection is true', () => {
+      const configEnabled = { ...mockConfig, enableArgumentCollection: true }
+      const manager = new TelemetryManager(configEnabled)
+      
+      const params = {
+        message: 'test',
+        options: {
+          format: 'json',
+          timestamp: true
+        }
+      }
+      const result = manager.getArgumentAttributes(params)
+      
+      expect(result).toEqual({
+        'mcp.request.argument.message': 'test',
+        'mcp.request.argument.options.format': 'json',
+        'mcp.request.argument.options.timestamp': true
+      })
+    })
+
+    it('should handle custom prefix', () => {
+      const configEnabled = { ...mockConfig, enableArgumentCollection: true }
+      const manager = new TelemetryManager(configEnabled)
+      
+      const params = { operation: 'add', a: 5, b: 10 }
+      const result = manager.getArgumentAttributes(params, 'custom.prefix')
+      
+      expect(result).toEqual({
+        'custom.prefix.operation': 'add',
+        'custom.prefix.a': 5,
+        'custom.prefix.b': 10
+      })
+    })
+
+    it('should handle null/undefined params', () => {
+      const configEnabled = { ...mockConfig, enableArgumentCollection: true }
+      const manager = new TelemetryManager(configEnabled)
+      
+      expect(manager.getArgumentAttributes(null)).toEqual({})
+      expect(manager.getArgumentAttributes(undefined)).toEqual({})
+    })
+  })
 })

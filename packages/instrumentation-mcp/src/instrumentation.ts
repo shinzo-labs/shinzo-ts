@@ -76,23 +76,6 @@ export class McpServerInstrumentation {
     // TODO add instrumentation for the sampling method
   }
 
-  private getParamsSpanAttributes(params: any, prefix = 'mcp.request.argument'): Record<string, any> {
-    const attributes: Record<string, any> = {}
-    const flatten = (obj: any, path: string) => {
-      for (const key in obj) {
-        const value = obj[key]
-        const attrKey = `${path}.${key}`
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
-          flatten(value, attrKey)
-        } else {
-          attributes[attrKey] = value
-        }
-      }
-    }
-    if (params && typeof params === 'object') flatten(params, prefix)
-    return attributes
-  }
-
   private createInstrumentedHandler(originalHandler: (...args: any[]) => any, method: string, name: string): (...args: any[]) => any {
     const requestId = generateUuid()
     const { address, port } = getRuntimeInfo()
@@ -118,7 +101,7 @@ export class McpServerInstrumentation {
         'mcp.request.id': requestId,
         'client.address': address,
         ...(port ? { 'client.port': port } : {}),
-        ...this.getParamsSpanAttributes(params)
+        ...(this.telemetryManager.getArgumentAttributes(params))
       }
 
       return this.telemetryManager.startActiveSpan(`${method} ${name}`, spanAttributes, async (span: Span) => {

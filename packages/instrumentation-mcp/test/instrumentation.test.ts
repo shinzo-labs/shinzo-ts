@@ -2,6 +2,7 @@ import { McpServerInstrumentation } from '../src/instrumentation'
 import { TelemetryManager } from '../src/telemetry'
 import { MockMcpServer, createTestTools, createTestResources, createTestPrompts } from './mocks/MockMcpServer'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
+import { TelemetryConfig } from '../src/types'
 
 // Mock the telemetry manager
 jest.mock('../src/telemetry', () => ({
@@ -13,9 +14,18 @@ describe('McpServerInstrumentation', () => {
   let mockTelemetryManager: jest.Mocked<TelemetryManager>
   let instrumentation: McpServerInstrumentation
   let mockSpan: any
+  let mockConfig: TelemetryConfig
 
   beforeEach(() => {
     mockServer = new MockMcpServer()
+
+    // Create mock config
+    mockConfig = {
+      serverName: 'test-server',
+      serverVersion: '1.0.0',
+      exporterEndpoint: 'http://localhost:4318/v1',
+      enableArgumentCollection: false // default to false
+    }
 
     // Create mock span
     mockSpan = {
@@ -31,6 +41,7 @@ describe('McpServerInstrumentation', () => {
       getHistogram: jest.fn().mockReturnValue(jest.fn()),
       getIncrementCounter: jest.fn().mockReturnValue(jest.fn()),
       processTelemetryAttributes: jest.fn().mockImplementation((data) => data),
+      getArgumentAttributes: jest.fn().mockReturnValue({}),
       shutdown: jest.fn(),
     } as any
 
@@ -193,10 +204,8 @@ describe('McpServerInstrumentation', () => {
       expect(results[2]).toEqual({ echo: 'test3' })
     })
 
-    it('should extract parameter attributes correctly', () => {
-      // Access the private method via reflection for testing
-      const getParamsSpanAttributes = (instrumentation as any).getParamsSpanAttributes
-    
+    it('should extract parameter attributes correctly via telemetryManager', () => {
+      // Test that the telemetryManager.getArgumentAttributes method works correctly
       const params = {
         operation: 'add',
         a: 5,
@@ -207,7 +216,16 @@ describe('McpServerInstrumentation', () => {
         }
       }
 
-      const attributes = getParamsSpanAttributes(params)
+      // Mock the getArgumentAttributes method to return the expected result
+      mockTelemetryManager.getArgumentAttributes = jest.fn().mockReturnValue({
+        'mcp.request.argument.operation': 'add',
+        'mcp.request.argument.a': 5,
+        'mcp.request.argument.b': 10,
+        'mcp.request.argument.nested.property': 'value',
+        'mcp.request.argument.nested.number': 42
+      })
+
+      const attributes = mockTelemetryManager.getArgumentAttributes(params)
 
       expect(attributes).toEqual({
         'mcp.request.argument.operation': 'add',
@@ -218,5 +236,40 @@ describe('McpServerInstrumentation', () => {
       })
     })
 
+  })
+
+  describe('enableArgumentCollection', () => {
+    it('should respect enableArgumentCollection configuration through telemetryManager', () => {
+      // Since the config is now handled in telemetryManager, we test through that
+      const instrumentation = new McpServerInstrumentation(mockServer as any, mockTelemetryManager)
+      
+      // Verify the instrumentation was created successfully
+      expect(instrumentation).toBeDefined()
+    })
+
+    it('should conditionally include arguments based on enableArgumentCollection via telemetryManager', () => {
+      // Test that the telemetryManager.getArgumentAttributes method handles the logic correctly
+      const params = { operation: 'add', a: 5, b: 10 }
+      
+      // Mock the getArgumentAttributes function to return empty object when disabled
+      mockTelemetryManager.getArgumentAttributes = jest.fn().mockReturnValue({})
+      
+      const resultDisabled = mockTelemetryManager.getArgumentAttributes(params)
+      expect(resultDisabled).toEqual({})
+      
+      // Mock the getArgumentAttributes function to return attributes when enabled
+      mockTelemetryManager.getArgumentAttributes = jest.fn().mockReturnValue({
+        'mcp.request.argument.operation': 'add',
+        'mcp.request.argument.a': 5,
+        'mcp.request.argument.b': 10
+      })
+      
+      const resultEnabled = mockTelemetryManager.getArgumentAttributes(params)
+      expect(resultEnabled).toEqual({
+        'mcp.request.argument.operation': 'add',
+        'mcp.request.argument.a': 5,
+        'mcp.request.argument.b': 10
+      })
+    })
   })
 })

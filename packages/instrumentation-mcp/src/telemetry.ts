@@ -155,6 +155,25 @@ export class TelemetryManager implements ObservabilityInstance {
     }
   }
 
+  public getArgumentAttributes(params: any, prefix = 'mcp.request.argument'): Record<string, any> {
+    if (!this.config.enableArgumentCollection) return {}
+
+    const attributes: Record<string, any> = {}
+    const flatten = (obj: any, path: string) => {
+      for (const key in obj) {
+        const value = obj[key]
+        const attrKey = `${path}.${key}`
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          flatten(value, attrKey)
+        } else {
+          attributes[attrKey] = value
+        }
+      }
+    }
+    if (params && typeof params === 'object') flatten(params, prefix)
+    return attributes
+  }
+
   private recordSessionDuration(): void {
     if (this.config.enableMetrics) {
       const recordHistogram = this.getHistogram('mcp.server.session.duration', {

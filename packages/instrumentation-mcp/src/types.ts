@@ -15,6 +15,7 @@ export interface TelemetryConfig {
   samplingRate?: number
   metricExportIntervalMs?: number
   enablePIISanitization?: boolean
+  enableArgumentCollection?: boolean
   dataProcessors?: ((data: any) => any)[]
   exporterType?: 'otlp-http' | 'otlp-grpc' | 'console'
   enableMetrics?: boolean

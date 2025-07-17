@@ -1,4 +1,4 @@
-import { ConfigValidator } from '../src/config'
+import { ConfigValidator, DEFAULT_CONFIG } from '../src/config'
 import { TelemetryConfig } from '../src/types'
 
 describe('ConfigValidator', () => {
@@ -105,6 +105,12 @@ describe('ConfigValidator', () => {
       }
 
       expect(() => ConfigValidator.validate(config)).not.toThrow()
+    })
+  })
+
+  describe('DEFAULT_CONFIG', () => {
+    it('should have enableArgumentCollection set to false by default', () => {
+      expect(DEFAULT_CONFIG.enableArgumentCollection).toBe(false)
     })
   })
 })

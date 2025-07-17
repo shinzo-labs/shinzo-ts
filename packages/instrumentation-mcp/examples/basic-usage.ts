@@ -23,7 +23,8 @@ const telemetryConfig: TelemetryConfig = {
     type: "bearer",
     token: process.env.OTEL_AUTH_TOKEN
   } : undefined,
-  samplingRate: parseFloat(process.env.OTEL_SAMPLING_RATE || "1.0")
+  samplingRate: parseFloat(process.env.OTEL_SAMPLING_RATE || "1.0"),
+  enableArgumentCollection: true // Enable argument collection for telemetry
 }
 
 // Initialize telemetry
