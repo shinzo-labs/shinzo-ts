@@ -6,17 +6,17 @@ This directory contains comprehensive tests for the Shinzo observability package
 
 ```
 test/
-├── README.md                 # This file
-├── setup.ts                  # Global test setup and mocks
-├── test-runner.ts           # Custom test runner with cleanup
 ├── mocks/
 │   └── MockMcpServer.ts     # Mock MCP server for testing
 ├── config.test.ts           # Configuration validation tests
-├── sanitizer.test.ts        # PII sanitization tests
-├── instrumentation.test.ts  # MCP server instrumentation tests
-├── telemetry.test.ts        # Telemetry manager tests
 ├── index.test.ts            # Main entry point tests
-└── integration.test.ts      # End-to-end integration tests
+├── instrumentation.test.ts  # MCP server instrumentation tests
+├── integration.test.ts      # End-to-end integration tests
+├── README.md                # This file
+├── sanitizer.test.ts        # PII sanitization tests
+├── setup.ts                 # Global test setup and mocks
+├── telemetry.test.ts        # Telemetry manager tests
+└── test-runner.ts           # Custom test runner with cleanup
 ```
 
 ## Test Categories
@@ -75,6 +75,9 @@ pnpm test --verbose
 
 # Run tests with coverage and open report
 pnpm test:coverage && open coverage/lcov-report/index.html
+
+# View coverage report in terminal
+pnpm test:coverage --verbose
 ```
 
 ## Test Features
@@ -153,15 +156,6 @@ Coverage reports are generated in the `coverage/` directory:
 - **Text Report**: Displayed in terminal
 - **LCOV Report**: `coverage/lcov.info`
 
-## Continuous Integration
-
-The test suite is optimized for CI/CD environments:
-
-- Uses `--ci` flag for better CI performance
-- Includes `--forceExit` to ensure clean shutdown
-- Generates coverage reports in CI-friendly formats
-- Includes timeout handling for hung tests
-
 ## Troubleshooting
 
 ### Common Issues
@@ -170,18 +164,6 @@ The test suite is optimized for CI/CD environments:
 2. **Memory leaks**: Tests use `--detectOpenHandles` and `--forceExit` to prevent this
 3. **Mock issues**: Check that all OpenTelemetry modules are properly mocked in `setup.ts`
 4. **Network calls**: All external dependencies are mocked; real network calls should not occur
-
-### Debug Mode
-
-Run tests with debug information:
-
-```bash
-# Enable debug logging
-DEBUG=* pnpm test
-
-# Run with Node.js inspector
-node --inspect-brk node_modules/.bin/jest --runInBand
-```
 
 ## Contributing
 

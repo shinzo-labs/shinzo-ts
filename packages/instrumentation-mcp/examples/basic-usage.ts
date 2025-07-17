@@ -14,11 +14,16 @@ const server = new McpServer({
   description: "Example MCP server with telemetry"
 })
 
-// Configure telemetry with comprehensive options
+// Configure telemetry with environment variable support
 const telemetryConfig: TelemetryConfig = {
   serverName: NAME,
   serverVersion: VERSION,
-  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1" // /trace and /metrics are added automatically
+  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1", // /trace and /metrics are added automatically
+  exporterAuth: process.env.OTEL_AUTH_TOKEN ? {
+    type: "bearer",
+    token: process.env.OTEL_AUTH_TOKEN
+  } : undefined,
+  samplingRate: parseFloat(process.env.OTEL_SAMPLING_RATE || "1.0")
 }
 
 // Initialize telemetry

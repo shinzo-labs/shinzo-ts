@@ -85,6 +85,91 @@ const telemetry = initializeAgentObservability(server, telemetryConfig)
 server.tool(...)
 ```
 
+## Configuration Options
+
+The `TelemetryConfig` interface provides comprehensive configuration options for customizing telemetry behavior:
+
+### TelemetryConfig Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `serverName` | `string` | ✅ | - | Name of the MCP server |
+| `serverVersion` | `string` | ✅ | - | Version of the MCP server |
+| `exporterEndpoint` | `string` | ⚠️ | - | OTLP endpoint URL (required unless using console exporter) |
+| `exporterAuth` | `ExporterAuth` | ❌ | - | Authentication configuration for the exporter |
+| `samplingRate` | `number` | ❌ | `1.0` | Trace sampling rate (0.0 to 1.0) |
+| `metricExportIntervalMs` | `number` | ❌ | `5000` | Metric export interval in milliseconds |
+| `enablePIISanitization` | `boolean` | ❌ | `true` | Enable automatic PII sanitization |
+| `dataProcessors` | `((data: any) => any)[]` | ❌ | `[]` | Array of custom data processing functions |
+| `exporterType` | `'otlp-http' \| 'otlp-grpc' \| 'console'` | ❌ | `'otlp-http'` | Type of telemetry exporter |
+| `enableMetrics` | `boolean` | ❌ | `true` | Enable metrics collection |
+| `enableTracing` | `boolean` | ❌ | `true` | Enable tracing collection |
+| `batchTimeoutMs` | `number` | ❌ | `2000` | Batch timeout in milliseconds |
+| `PIISanitizer` | `PIISanitizer` | ❌ | - | Custom PII sanitizer instance |
+
+### ExporterAuth Configuration
+
+The `exporterAuth` property supports multiple authentication methods:
+
+| Auth Type | Properties | Description |
+|-----------|------------|-------------|
+| `bearer` | `token: string` | Bearer token authentication |
+| `apiKey` | `apiKey: string` | API key authentication |
+| `basic` | `username: string, password: string` | Basic HTTP authentication |
+
+### Usage Examples
+
+#### Minimal Configuration
+```typescript
+const telemetryConfig: TelemetryConfig = {
+  serverName: "my-server",
+  serverVersion: "1.0.0",
+  exporterEndpoint: "http://localhost:4318/v1"
+}
+```
+
+#### Bearer Token Authentication
+```typescript
+const telemetryConfig: TelemetryConfig = {
+  serverName: "my-server",
+  serverVersion: "1.0.0",
+  exporterEndpoint: "https://api.example.com/v1",
+  exporterAuth: {
+    type: "bearer",
+    token: process.env.OTEL_AUTH_TOKEN
+  }
+}
+```
+
+#### Custom Data Processing
+```typescript
+const telemetryConfig: TelemetryConfig = {
+  serverName: "my-server",
+  serverVersion: "1.0.0",
+  exporterEndpoint: "http://localhost:4318/v1",
+  dataProcessors: [
+    (data) => {
+      // Remove sensitive parameters
+      if (data['mcp.tool.name'] === 'sensitive_tool') {
+        delete data['mcp.request.argument.password']
+      }
+      return data
+    }
+  ]
+}
+```
+
+#### Console Development Setup
+```typescript
+const telemetryConfig: TelemetryConfig = {
+  serverName: "my-server",
+  serverVersion: "1.0.0",
+  exporterType: "console",
+  enableMetrics: false, // Console exporter doesn't support metrics
+  samplingRate: 1.0 // Sample all traces in development
+}
+```
+
 ## Features
 
 - **Automatic Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.

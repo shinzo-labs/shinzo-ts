@@ -66,39 +66,29 @@ Then instrument your MCP server using the SDK. Example:
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { initializeAgentObservability, TelemetryConfig } from "@shinzo/instrumentation-mcp"
 
+const NAME = "my-mcp-server"
+const VERSION = "1.0.0"
+
 const server = new McpServer({
-  name: "example-server",
-  version: "1.0.0",
+  name: NAME,
+  version: VERSION,
   description: "Example MCP server with telemetry"
 })
 
+// Use TelemetryConfig to set configuration options
 const telemetryConfig: TelemetryConfig = {
-  serviceName: "my-mcp-server",
-  serviceVersion: "1.2.0",
-  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1/traces",
-  exporterAuth: process.env.OTEL_AUTH_TOKEN ? {
-    type: "bearer",
-    token: process.env.OTEL_AUTH_TOKEN
-  } : undefined,
-  samplingRate: parseFloat(process.env.OTEL_SAMPLING_RATE || "1.0"),
-  enableUserConsent: process.env.ENABLE_USER_CONSENT === "true",
-  enablePIISanitization: process.env.ENABLE_PII_SANITIZATION !== "false",
-  dataProcessors: [
-    (telemetryData: any) => {
-      if (telemetryData.toolName === "sensitive_operation") {
-        if (telemetryData.parameters) delete telemetryData.parameters.apiKey
-      }
-      return telemetryData
-    }
-  ]
+  serverName: NAME,
+  serverVersion: VERSION,
+  exporterEndpoint: "http://localhost:4318/v1" // /trace and /metrics are added automatically
 }
 
+// Initialize telemetry
 const telemetry = initializeAgentObservability(server, telemetryConfig)
 
-// ... add your tools and start your server as usual ...
+// Add tools using the tool method
+server.tool(...)
 ```
 
 See [`packages/instrumentation-mcp/examples/basic-usage.ts`](./packages/instrumentation-mcp/examples/basic-usage.ts) for a full working example.
@@ -141,9 +131,9 @@ pnpm lint         # Lint the codebase
   - ✅ 🏗️ System Architecture Design
   - ✅ 🤝 Contributor Operations
 
-- ⬜️ **Phase 1** _(July 2025)_
-  - ⬜️ 📏 OpenTelemetry MCP semantic conventions
-  - ⬜️ 🛠️ TypeScript Instrumentation SDK
+- ✅ **Phase 1** _(July 2025)_
+  - ✅ 📏 OpenTelemetry MCP semantic conventions
+  - ✅ 🛠️ TypeScript Instrumentation SDK
 
 - ⬜️ **Phase 2** _(August 2025)_
   - ⬜️ 📡 Telemetry Collector
