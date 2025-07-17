@@ -1,6 +1,6 @@
 import { trace, metrics, Span, Tracer, Meter, MetricOptions } from '@opentelemetry/api'
 import { NodeSDK, NodeSDKConfiguration } from '@opentelemetry/sdk-node'
-import { Resource } from '@opentelemetry/resources'
+import { hostDetector, Resource, envDetector, osDetector, serviceInstanceIdDetectorSync } from '@opentelemetry/resources'
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions'
 import { TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
@@ -17,7 +17,7 @@ export class TelemetryManager implements ObservabilityInstance {
   private config: TelemetryConfig
   public tracer: Tracer
   public meter: Meter
-  public piiSanitizer: PIISanitizer
+  public piiSanitizer: PIISanitizer | undefined
   private sessionId: string
   private sessionStart: number
   private isInitialized: boolean = false
@@ -26,7 +26,10 @@ export class TelemetryManager implements ObservabilityInstance {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = generateUuid()
     this.sessionStart = Date.now()
-    this.piiSanitizer = new PIISanitizer(this.config.enablePIISanitization || false)
+
+    if (config.enablePIISanitization) {
+      this.piiSanitizer = config.PIISanitizer || new PIISanitizer()
+    }
 
     const resource = new Resource({
       [ATTR_SERVICE_NAME]: this.config.serverName,
@@ -34,7 +37,19 @@ export class TelemetryManager implements ObservabilityInstance {
       'mcp.session.id': this.sessionId,
     })
   
-    const sdkConfig: Partial<NodeSDKConfiguration> = { resource }
+    const sdkConfig: Partial<NodeSDKConfiguration> = {
+      resource,
+      resourceDetectors: [
+        envDetector,
+        hostDetector,
+        osDetector,
+        serviceInstanceIdDetectorSync
+      ]
+    }
+
+    if (this.piiSanitizer) {
+      sdkConfig.resourceDetectors?.push(this.piiSanitizer.redactPIIAttributes())
+    }
 
     if (this.config.enableTracing) {
       sdkConfig.traceExporter = this.createTraceExporter()
@@ -154,14 +169,14 @@ export class TelemetryManager implements ObservabilityInstance {
   public processTelemetryAttributes(data: Record<string, any>): Record<string, any> {
     let processedData = { ...data }
 
-    if (this.config.enablePIISanitization) {
-      processedData = this.piiSanitizer.sanitize(processedData)
-    }
-
     if (this.config.dataProcessors) {
       for (const processor of this.config.dataProcessors) {
         processedData = processor(processedData)
       }
+    }
+
+    if (this.piiSanitizer) {
+      processedData = this.piiSanitizer.sanitize(processedData)
     }
 
     return processedData

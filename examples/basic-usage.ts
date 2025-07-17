@@ -18,18 +18,7 @@ const server = new McpServer({
 const telemetryConfig: TelemetryConfig = {
   serverName: NAME,
   serverVersion: VERSION,
-  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1", // /trace and /metrics are added automatically
-  dataProcessors: [
-    // Custom processor to remove sensitive data
-    (telemetryData: any) => {
-      if (telemetryData.toolName === "sensitive_operation") {
-        if (telemetryData.parameters) {
-          delete telemetryData.parameters.apiKey
-        }
-      }
-      return telemetryData
-    }
-  ]
+  exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318/v1" // /trace and /metrics are added automatically
 }
 
 // Initialize telemetry

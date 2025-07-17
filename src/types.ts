@@ -1,4 +1,5 @@
 import { MetricOptions, Span } from '@opentelemetry/api'
+import { PIISanitizer } from './sanitizer'
 
 export interface TelemetryConfig {
   exporterEndpoint?: string
@@ -20,6 +21,7 @@ export interface TelemetryConfig {
   enableTracing?: boolean
   batchTimeout?: number
   maxBatchSize?: number
+  PIISanitizer?: PIISanitizer
 }
 
 export interface AuthConfig {

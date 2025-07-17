@@ -121,7 +121,7 @@ export class McpServerInstrumentation {
         ...this.getParamsSpanAttributes(params)
       }
 
-      return this.telemetryManager.startActiveSpan(`${method} ${name}`, { attributes: spanAttributes }, async (span: Span) => {
+      return this.telemetryManager.startActiveSpan(`${method} ${name}`, spanAttributes, async (span: Span) => {
         incrementCounter(1)
 
         let result: any

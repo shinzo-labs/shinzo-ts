@@ -1,9 +1,9 @@
+import { DetectorSync, Resource } from "@opentelemetry/resources"
+
 export class PIISanitizer {
   private readonly piiPatterns: RegExp[]
-  private readonly enabled: boolean
 
-  constructor(enabled: boolean = true) {
-    this.enabled = enabled
+  constructor() {
     this.piiPatterns = [
       /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g, // Credit card numbers
       /\b\d{3}-\d{2}-\d{4}\b/g, // SSN
@@ -15,28 +15,18 @@ export class PIISanitizer {
     ]
   }
 
+  public redactPIIAttributes(): DetectorSync {
+    return {
+      detect: () => new Resource({
+        'client.address': '[REDACTED]',
+        'client.port': '[REDACTED]',
+        'host.id': '[REDACTED]'
+      })
+    }
+  }
+
   public sanitize(data: Record<string, any>): Record<string, any> {
-    if (!this.enabled) return data
-
-    const sanitizedData = { ...data }
-
-    if (sanitizedData.parameters) {
-      sanitizedData.parameters = this.sanitizeObject(sanitizedData.parameters)
-    }
-
-    if (sanitizedData.result) {
-      sanitizedData.result = this.sanitizeValue(sanitizedData.result)
-    }
-
-    if (sanitizedData.error) {
-      sanitizedData.error = {
-        ...sanitizedData.error,
-        message: this.sanitizeString(sanitizedData.error.message),
-        stack: sanitizedData.error.stack ? this.sanitizeString(sanitizedData.error.stack) : undefined
-      }
-    }
-
-    return sanitizedData
+    return this.sanitizeValue(data)
   }
 
   private sanitizeObject(obj: any): any {
