@@ -10,6 +10,9 @@ dist/
 build/
 *.tsbuildinfo
 
+# Test coverage
+coverage/
+
 # Env files
 .env
 .env.*
