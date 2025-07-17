@@ -1,52 +1,3 @@
-// Mock OpenTelemetry modules
-jest.mock('@opentelemetry/sdk-node', () => ({
-  NodeSDK: jest.fn().mockImplementation(() => ({
-    start: jest.fn(),
-    shutdown: jest.fn().mockResolvedValue(undefined)
-  }))
-}))
-jest.mock('@opentelemetry/resources', () => ({
-  resourceFromAttributes: jest.fn().mockReturnValue({}),
-}))
-jest.mock('@opentelemetry/sdk-trace-base', () => ({
-  TraceIdRatioBasedSampler: jest.fn().mockImplementation(() => ({})),
-  ConsoleSpanExporter: jest.fn().mockImplementation(() => ({}))
-}))
-jest.mock('@opentelemetry/exporter-trace-otlp-http', () => ({
-  OTLPTraceExporter: jest.fn().mockImplementation(() => ({}))
-}))
-jest.mock('@opentelemetry/exporter-metrics-otlp-http', () => ({
-  OTLPMetricExporter: jest.fn().mockImplementation(() => ({}))
-}))
-jest.mock('@opentelemetry/sdk-metrics', () => ({
-  PeriodicExportingMetricReader: jest.fn().mockImplementation(() => ({}))
-}))
-jest.mock('@opentelemetry/api', () => ({
-  trace: {
-    getTracer: jest.fn().mockReturnValue({
-      startSpan: jest.fn().mockReturnValue({
-        setAttributes: jest.fn(),
-        setStatus: jest.fn(),
-        end: jest.fn()
-      }),
-      startActiveSpan: jest.fn().mockImplementation((name, options, fn) => fn({
-        setAttributes: jest.fn(),
-        setStatus: jest.fn(),
-        end: jest.fn()
-      }))
-    })
-  },
-  metrics: {
-    getMeter: jest.fn().mockReturnValue({
-      createHistogram: jest.fn().mockReturnValue({
-        record: jest.fn()
-      }),
-      createCounter: jest.fn().mockReturnValue({
-        add: jest.fn()
-      })
-    })
-  }
-}))
 
 import { TelemetryManager } from '../src/telemetry'
 import { TelemetryConfig } from '../src/types'
@@ -144,7 +95,10 @@ describe('TelemetryManager', () => {
     })
 
     it('should create counter function', () => {
-      const counterFn = telemetryManager.getIncrementCounter('test-counter')
+      const counterFn = telemetryManager.getIncrementCounter('test-counter', {
+        description: 'Test counter',
+        unit: 'requests'
+      })
     
       expect(typeof counterFn).toBe('function')
       expect(() => counterFn(1, { 'test.attribute': 'value' })).not.toThrow()

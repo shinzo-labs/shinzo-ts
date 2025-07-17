@@ -8,7 +8,7 @@ import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http'
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base'
 import { TelemetryConfig, ObservabilityInstance } from './types'
-import { DEFAULT_CONFIG } from './config'
+import { ConfigValidator, DEFAULT_CONFIG } from './config'
 import { PIISanitizer } from './sanitizer'
 import { generateUuid } from './utils'
 
@@ -23,6 +23,8 @@ export class TelemetryManager implements ObservabilityInstance {
   private isInitialized: boolean = false
 
   constructor(config: TelemetryConfig) {
+    ConfigValidator.validate(config)
+
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.sessionId = generateUuid()
     this.sessionStart = Date.now()
@@ -84,10 +86,11 @@ export class TelemetryManager implements ObservabilityInstance {
         case 'apiKey':
           headers['X-API-Key'] = this.config.exporterAuth.apiKey!
           break
-        case 'basic':
+        case 'basic': {
           const encoded = Buffer.from(`${this.config.exporterAuth.username}:${this.config.exporterAuth.password}`).toString('base64')
           headers['Authorization'] = `Basic ${encoded}`
           break
+        }
       }
     }
 

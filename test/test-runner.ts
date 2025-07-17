@@ -163,7 +163,7 @@ if (require.main === module) {
   const args = process.argv.slice(2)
   const options: TestRunnerOptions = {}
 
-  for (let i = 0 i < args.length i++) {
+  for (let i = 0; i < args.length; i++) {
     const arg = args[i]
     switch (arg) {
       case '--coverage':

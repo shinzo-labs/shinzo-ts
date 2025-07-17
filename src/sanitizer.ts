@@ -42,6 +42,12 @@ export class PIISanitizer {
 
   private sanitizeValue(value: any): any {
     if (typeof value === 'string') return this.sanitizeString(value)
+    else if (value instanceof Error) {
+      const sanitizedError = new Error(this.sanitizeString(value.message))
+      sanitizedError.name = value.name
+      sanitizedError.stack = value.stack ? this.sanitizeString(value.stack) : value.stack
+      return sanitizedError
+    }
     else if (typeof value === 'object' && value !== null) {
       return Array.isArray(value)
         ? value.map(item => this.sanitizeValue(item))

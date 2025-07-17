@@ -36,7 +36,7 @@ export class McpServerInstrumentation {
     const originalTool = this.server.tool.bind(this.server)
 
     this.server.tool = (name: string, ...rest: any[]): RegisteredTool => {
-      const cb = rest[rest.length - 1] as Function
+      const cb = rest[rest.length - 1] as (...args: any[]) => any
       if (typeof cb === 'function') {
         rest[rest.length - 1] = this.createInstrumentedHandler(cb, 'tools/call', name)
       }
@@ -93,7 +93,7 @@ export class McpServerInstrumentation {
     return attributes
   }
 
-  private createInstrumentedHandler(originalHandler: Function, method: string, name: string): Function {
+  private createInstrumentedHandler(originalHandler: (...args: any[]) => any, method: string, name: string): (...args: any[]) => any {
     const requestId = generateUuid()
     const { address, port } = getRuntimeInfo()
 
@@ -133,7 +133,6 @@ export class McpServerInstrumentation {
           result = await originalHandler.apply(this.server, [params])
           span.setStatus({ code: SpanStatusCode.OK })
         } catch (error) {
-          error = error
           span.setStatus({ code: SpanStatusCode.ERROR, message: (error as Error).message })
           span.setAttribute('error.type', (error as Error).name)
         }

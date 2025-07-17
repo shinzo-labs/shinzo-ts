@@ -1,6 +1,5 @@
 import { TelemetryManager } from './telemetry'
 import { McpServerInstrumentation } from './instrumentation'
-import { ConfigValidator } from './config'
 import { TelemetryConfig, ObservabilityInstance } from './types'
 import { MetricOptions, Span } from '@opentelemetry/api'
 
@@ -10,8 +9,6 @@ export function initializeAgentObservability(
   server: McpServer,
   config: TelemetryConfig
 ): ObservabilityInstance {
-  ConfigValidator.validate(config)
-
   const telemetryManager = new TelemetryManager(config)
   const instrumentation = new McpServerInstrumentation(server, telemetryManager)
   instrumentation.instrument()
@@ -37,7 +34,6 @@ export function initializeAgentObservability(
 
 export { TelemetryManager } from './telemetry'
 export { PIISanitizer } from './sanitizer'
-export { ConfigValidator } from './config'
 
 export type {
   AuthConfig,

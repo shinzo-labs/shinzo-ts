@@ -45,13 +45,24 @@ jest.mock('@opentelemetry/api', () => ({
         setAttributes: jest.fn(),
         setStatus: jest.fn(),
         end: jest.fn()
-      }))
+      })),
+      startActiveSpan: jest.fn((name, options, fn) => {
+        const span = {
+          setAttributes: jest.fn(),
+          setStatus: jest.fn(),
+          end: jest.fn()
+        }
+        return fn(span)
+      })
     }))
   },
   metrics: {
     getMeter: jest.fn(() => ({
       createHistogram: jest.fn(() => ({
         record: jest.fn()
+      })),
+      createCounter: jest.fn(() => ({
+        add: jest.fn()
       }))
     }))
   },
@@ -77,7 +88,11 @@ jest.mock('@opentelemetry/sdk-node', () => ({
 }))
 
 jest.mock('@opentelemetry/resources', () => ({
-  Resource: jest.fn(() => ({}))
+  Resource: jest.fn().mockImplementation(() => ({})),
+  hostDetector: jest.fn(),
+  envDetector: jest.fn(),
+  osDetector: jest.fn(),
+  serviceInstanceIdDetectorSync: jest.fn()
 }))
 
 jest.mock('@opentelemetry/semantic-conventions', () => ({
@@ -96,7 +111,8 @@ jest.mock('@opentelemetry/exporter-metrics-otlp-http', () => ({
 }))
 
 jest.mock('@opentelemetry/sdk-trace-base', () => ({
-  ConsoleSpanExporter: jest.fn().mockImplementation(() => ({}))
+  ConsoleSpanExporter: jest.fn().mockImplementation(() => ({})),
+  TraceIdRatioBasedSampler: jest.fn().mockImplementation(() => ({}))
 }))
 
 jest.mock('@opentelemetry/sdk-metrics', () => ({
