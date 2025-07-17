@@ -10,7 +10,12 @@ jest.mock('@opentelemetry/sdk-node', () => ({
   }))
 }))
 jest.mock('@opentelemetry/resources', () => ({
+  Resource: jest.fn().mockImplementation(() => ({})),
   resourceFromAttributes: jest.fn().mockReturnValue({}),
+  hostDetector: {},
+  envDetector: {},
+  osDetector: {},
+  serviceInstanceIdDetectorSync: {}
 }))
 jest.mock('@opentelemetry/sdk-trace-base', () => ({
   TraceIdRatioBasedSampler: jest.fn().mockImplementation(() => ({})),

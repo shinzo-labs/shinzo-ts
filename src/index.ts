@@ -34,6 +34,7 @@ export function initializeAgentObservability(
 
 export { TelemetryManager } from './telemetry'
 export { PIISanitizer } from './sanitizer'
+export { ConfigValidator } from './config'
 
 export type {
   AuthConfig,

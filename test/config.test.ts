@@ -1,4 +1,4 @@
-import { ConfigValidator, DEFAULT_CONFIG } from '../src/config'
+import { ConfigValidator } from '../src/config'
 import { TelemetryConfig } from '../src/types'
 
 describe('ConfigValidator', () => {
