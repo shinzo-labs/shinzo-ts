@@ -57,16 +57,16 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 Add Shinzo to your MCP server project:
 
 ```sh
-pnpm add @shinzo/instrumentation-mcp
+pnpm add @shinzolabs/instrumentation-mcp
 # or
-npm install @shinzo/instrumentation-mcp
+npm install @shinzolabs/instrumentation-mcp
 ```
 
 Then instrument your MCP server using the SDK. Example:
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { instrumentServer, TelemetryConfig } from "@shinzo/instrumentation-mcp"
+import { instrumentServer, TelemetryConfig } from "@shinzolabs/instrumentation-mcp"
 
 const NAME = "my-mcp-server"
 const VERSION = "1.0.0"

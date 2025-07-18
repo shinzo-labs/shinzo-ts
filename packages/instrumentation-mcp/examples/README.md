@@ -1,6 +1,6 @@
-# @shinzo/instrumentation-mcp Examples
+# @shinzolabs/instrumentation-mcp Examples
 
-This directory contains example MCP servers demonstrating how to use the `@shinzo/instrumentation-mcp` package for telemetry and observability.
+This directory contains example MCP servers demonstrating how to use the `@shinzolabs/instrumentation-mcp` package for telemetry and observability.
 
 ## Available Examples
 

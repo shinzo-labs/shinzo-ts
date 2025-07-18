@@ -2,7 +2,7 @@
   <a href="https://github.com/shinzo-labs/shinzo-ts">
     <img src="https://github.com/user-attachments/assets/78542e5b-1da1-44ad-a3e2-5b4eb9e6a962" alt="Shinzo Logo" width="180" height="180">
   </a>
-  <h1 align="center">@shinzo/instrumentation-mcp</h1>
+  <h1 align="center">@shinzolabs/instrumentation-mcp</h1>
   <p align="center">
     <b>OpenTelemetry instrumentation for MCP servers.</b><br/>
 
@@ -12,9 +12,9 @@
 ## Installation
 
 ```bash
-npm install @shinzo/instrumentation-mcp
+npm install @shinzolabs/instrumentation-mcp
 # or
-pnpm add @shinzo/instrumentation-mcp
+pnpm add @shinzolabs/instrumentation-mcp
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ For minimal-footprint usage, just pass in the server name, version, and exporter
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { instrumentServer, TelemetryConfig } from "@shinzo/instrumentation-mcp"
+import { instrumentServer, TelemetryConfig } from "@shinzolabs/instrumentation-mcp"
 
 const NAME = "my-mcp-server"
 const VERSION = "1.0.0"
@@ -52,7 +52,7 @@ The TelemetryConfig also exposes a number of other options for precise telemetry
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
-import { instrumentServer, TelemetryConfig } from "@shinzo/instrumentation-mcp"
+import { instrumentServer, TelemetryConfig } from "@shinzolabs/instrumentation-mcp"
 
 const NAME = "my-other-mcp-server"
 const VERSION = "1.0.0"
