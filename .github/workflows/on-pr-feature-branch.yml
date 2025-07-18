@@ -26,13 +26,36 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check for changeset
         run: npx @changesets/cli status --since=origin/main
+      - name: Validate package versions
+        run: |
+          # Check if any package versions have been manually bumped without changesets
+          git diff --name-only origin/main...HEAD | grep 'package\.json$' | while read file; do
+            if git diff origin/main...HEAD "$file" | grep -q '"version"'; then
+              echo "⚠️  Version change detected in $file without changeset"
+              echo "Please use 'pnpm changeset' to manage version bumps"
+              exit 1
+            fi
+          done
 
   validate-build:
     name: Validate build and tests
@@ -43,9 +66,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Run linting
@@ -56,3 +92,13 @@ jobs:
         run: pnpm run test:ci
       - name: Build packages
         run: pnpm run build
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            **/coverage/
+            **/test-results.xml
+            **/junit.xml
+          retention-days: 30
