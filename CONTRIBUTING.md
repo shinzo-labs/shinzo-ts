@@ -43,10 +43,8 @@ This project uses [Changesets](https://github.com/changesets/changesets) to mana
 
 #### Creating a Changeset
 
-When you make changes that should trigger a new release, run:
+When you make changes that should trigger a new release, run the following in the top level directory:
 ```bash
-npx @changesets/cli
-# or
 pnpm changeset
 ```
 
