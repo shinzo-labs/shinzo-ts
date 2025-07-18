@@ -1,5 +1,11 @@
 # @shinzo/instrumentation-mcp
 
+## 1.0.1
+
+### Patch Changes
+
+- 9e77a8c: npm pkg fix
+
 ## 1.0.0
 
 ### Major Changes
