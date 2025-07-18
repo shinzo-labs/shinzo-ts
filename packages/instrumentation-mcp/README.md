@@ -38,7 +38,7 @@ const server = new McpServer({
 const telemetryConfig: TelemetryConfig = {
   serverName: NAME,
   serverVersion: VERSION,
-  exporterEndpoint: "http://localhost:4318/v1" // /trace and /metrics are added automatically
+  exporterEndpoint: "http://localhost:4318/v1" // OpenTelemetry collector endpoint - /trace and /metrics are added automatically
 }
 
 // Initialize telemetry
@@ -66,7 +66,7 @@ const server = new McpServer({
 const telemetryConfig: TelemetryConfig = {
   serviceName: NAME,
   serviceVersion: VERSION,
-  exporterEndpoint: "http://localhost:4318/v1",
+  exporterEndpoint: "http://localhost:4318/v1", // OpenTelemetry collector endpoint
   exporterAuth: {
     type: "bearer",
     token: process.env.OTEL_AUTH_TOKEN
@@ -102,7 +102,7 @@ The `TelemetryConfig` interface provides comprehensive configuration options for
 |----------|------|----------|---------|-------------|
 | `serverName` | `string` | ✅ | - | Name of the MCP server |
 | `serverVersion` | `string` | ✅ | - | Version of the MCP server |
-| `exporterEndpoint` | `string` | ⚠️ | - | OTLP endpoint URL (required unless using console exporter) |
+| `exporterEndpoint` | `string` | ⚠️ | - | OpenTelemetry collector OTLP endpoint URL (required unless using console exporter) |
 | `exporterAuth` | `ExporterAuth` | ❌ | - | Authentication configuration for the exporter |
 | `samplingRate` | `number` | ❌ | `1.0` | Trace sampling rate (0.0 to 1.0) |
 | `metricExportIntervalMs` | `number` | ❌ | `5000` | Metric export interval in milliseconds |
@@ -132,7 +132,7 @@ The `exporterAuth` property supports multiple authentication methods:
 const telemetryConfig: TelemetryConfig = {
   serverName: "my-server",
   serverVersion: "1.0.0",
-  exporterEndpoint: "http://localhost:4318/v1"
+  exporterEndpoint: "http://localhost:4318/v1" // OpenTelemetry collector endpoint
 }
 ```
 
@@ -154,7 +154,7 @@ const telemetryConfig: TelemetryConfig = {
 const telemetryConfig: TelemetryConfig = {
   serverName: "my-server",
   serverVersion: "1.0.0",
-  exporterEndpoint: "http://localhost:4318/v1",
+  exporterEndpoint: "http://localhost:4318/v1", // OpenTelemetry collector endpoint
   dataProcessors: [
     (data) => {
       // Remove sensitive parameters
@@ -182,7 +182,7 @@ const telemetryConfig: TelemetryConfig = {
 
 - **Automatic Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.
 - **Anonymous, Configurable Telemetry**: Built-in PII sanitization and user consent mechanisms ensure you always remain compliant with GDPR, CCPA/CPRA and other data privacy regulation.
-- **OpenTelemetry-Compatible**: Fully compatible with OpenTelemetry standards and can be used with any OpenTelemetry-compatible service.
+- **OpenTelemetry-Compatible**: Fully compatible with OpenTelemetry standards and can be used with any OpenTelemetry-compatible service. See [OpenTelemetry vendors](https://opentelemetry.io/ecosystem/vendors/) for available collector options.
 
 ## Documentation
 

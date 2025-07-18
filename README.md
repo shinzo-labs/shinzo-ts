@@ -48,7 +48,7 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 - **Anonymous, Configurable Telemetry**: Built-in PII sanitization and user consent mechanisms ensure you always remain compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation.
 - **Full Control**: All components of Shinzo can be self-hosted with our sustainable use license or cloud hosted through Shinzo Labs.
 - **Custom Analytics Dashboards**: Self-hosted, real-time dashboards for tool usage, performance, and traces.
-- **OpenTelemetry-Compatible**: Since the entire stack meets OpenTelemetry standard conventions, developers can mix-and-match our components with any OpenTelemetry-compatible service.
+- **OpenTelemetry-Compatible**: Since the entire stack meets OpenTelemetry standard conventions, developers can mix-and-match our components with any OpenTelemetry-compatible service. See [OpenTelemetry vendors](https://opentelemetry.io/ecosystem/vendors/) for available options.
 
 ## ⚙️ Setup
 
@@ -81,7 +81,7 @@ const server = new McpServer({
 const telemetryConfig: TelemetryConfig = {
   serverName: NAME,
   serverVersion: VERSION,
-  exporterEndpoint: "http://localhost:4318/v1" // /trace and /metrics are added automatically
+  exporterEndpoint: "http://localhost:4318/v1" // OpenTelemetry collector endpoint - /trace and /metrics are added automatically
 }
 
 // Initialize telemetry

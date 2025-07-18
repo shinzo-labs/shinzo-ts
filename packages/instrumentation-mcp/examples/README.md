@@ -50,7 +50,7 @@ The examples support the following environment variables:
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | string | `http://localhost:4318/v1` | OpenTelemetry collector endpoint |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | string | `http://localhost:4318/v1` | OpenTelemetry collector endpoint (see [OpenTelemetry vendors](https://opentelemetry.io/ecosystem/vendors/) for available collectors) |
 | `OTEL_AUTH_TOKEN` | string | - | Bearer token for authentication |
 | `OTEL_SAMPLING_RATE` | number | `1.0` | Trace sampling rate (0.0 to 1.0) |
 
@@ -66,7 +66,7 @@ Add to your Claude Desktop configuration file:
       "command": "npx",
       "args": ["ts-node", "/path/to/shinzo/packages/instrumentation-mcp/examples/basic-usage.ts"],
       "env": {
-        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318/v1",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318/v1", // OpenTelemetry collector endpoint
         "OTEL_AUTH_TOKEN": "my-auth-token"
       }
     }
@@ -90,7 +90,7 @@ Both examples include proper error handling and graceful shutdown procedures.
 1. **Run the Examples**: Start with the basic usage example to understand the fundamentals
 2. **Modify Configuration**: Experiment with different `TelemetryConfig` options
 3. **Add Custom Tools**: Extend the examples with your own tool implementations
-4. **Set Up Collection**: Configure an OpenTelemetry collector to receive the telemetry data
+4. **Set Up Collection**: Configure an OpenTelemetry collector to receive the telemetry data (see [OpenTelemetry vendors](https://opentelemetry.io/ecosystem/vendors/) for available options)
 5. **Explore Advanced Features**: Check out the main README for comprehensive configuration options
 
 For complete documentation, visit the [main Shinzo repository](https://github.com/shinzo-labs/shinzo-ts).
