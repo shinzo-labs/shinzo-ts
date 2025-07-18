@@ -56,12 +56,14 @@ jobs:
           fi
           
           git diff --name-only origin/main...HEAD | grep 'package\.json$' | while read file; do
-            if git diff origin/main...HEAD "$file" | grep -q '"version"'; then
-              # Get the version changes
-              version_changes=$(git diff origin/main...HEAD "$file" | grep '"version"')
-              
+            # Get the old and new version numbers
+            old_version=$(git show origin/main:"$file" | grep '"version":' | sed 's/.*"version": "\([^"]*\)".*/\1/')
+            new_version=$(git show HEAD:"$file" | grep '"version":' | sed 's/.*"version": "\([^"]*\)".*/\1/')
+            
+            # Check if versions are different
+            if [[ "$old_version" != "$new_version" ]]; then
               # Allow changes to/from "0.0.0" (initial setup only)
-              if echo "$version_changes" | grep -q '"0.0.0"'; then
+              if [[ "$old_version" == "0.0.0" ]] || [[ "$new_version" == "0.0.0" ]]; then
                 echo "✅ Allowing version change to/from 0.0.0 in $file (initial setup)"
                 continue
               fi
@@ -70,12 +72,12 @@ jobs:
               if [[ "$file" == "package.json" ]]; then
                 echo "⚠️  Root package.json version should remain at 0.0.0"
                 echo "Only workspace packages should be versioned via changesets"
-                echo "Changes: $version_changes"
+                echo "Version changed from $old_version to $new_version"
                 exit 1
               fi
               
               echo "⚠️  Version change detected in $file without changeset"
-              echo "Changes: $version_changes"
+              echo "Version changed from $old_version to $new_version"
               echo "Please use 'pnpm changeset' to manage version bumps"
               exit 1
             fi
