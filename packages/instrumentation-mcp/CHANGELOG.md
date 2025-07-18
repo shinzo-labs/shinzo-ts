@@ -1,5 +1,11 @@
 # @shinzo/instrumentation-mcp
 
+## 1.0.3
+
+### Patch Changes
+
+- 175fe4c: Update documentation to explain OTel collector endpoint
+
 ## 1.0.2
 
 ### Patch Changes
