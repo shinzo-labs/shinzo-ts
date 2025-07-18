@@ -1,5 +1,11 @@
 # @shinzo/instrumentation-mcp
 
+## 1.0.2
+
+### Patch Changes
+
+- 2846ad2: Change package title and description
+
 ## 1.0.1
 
 ### Patch Changes
