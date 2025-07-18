@@ -29,7 +29,7 @@ export class TelemetryManager implements ObservabilityInstance {
     this.sessionId = generateUuid()
     this.sessionStart = Date.now()
 
-    if (config.enablePIISanitization) {
+    if (this.config.enablePIISanitization) {
       this.piiSanitizer = config.PIISanitizer || new PIISanitizer()
     }
 
