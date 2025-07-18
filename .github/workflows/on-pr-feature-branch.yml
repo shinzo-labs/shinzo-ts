@@ -60,10 +60,18 @@ jobs:
               # Get the version changes
               version_changes=$(git diff origin/main...HEAD "$file" | grep '"version"')
               
-              # Allow changes to/from "0.0.0" (initial setup)
+              # Allow changes to/from "0.0.0" (initial setup only)
               if echo "$version_changes" | grep -q '"0.0.0"'; then
                 echo "✅ Allowing version change to/from 0.0.0 in $file (initial setup)"
                 continue
+              fi
+              
+              # Root package.json should remain at 0.0.0 (private coordination package)
+              if [[ "$file" == "package.json" ]]; then
+                echo "⚠️  Root package.json version should remain at 0.0.0"
+                echo "Only workspace packages should be versioned via changesets"
+                echo "Changes: $version_changes"
+                exit 1
               fi
               
               echo "⚠️  Version change detected in $file without changeset"

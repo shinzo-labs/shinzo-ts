@@ -37,13 +37,18 @@ Once you have been assigned an issue, the steps to contribute are:
 8. Once the core contributor has reviewed the code and all comments have been resolved, the PR will be approved and merged into the `main` branch.
 9. When your PR is merged, the changeset will be used to automatically create a release PR with proper version bumps and changelogs. Once the release PR is merged, updated packages will be published to npm automatically.
 
-### Working with Changesets
+### Version Management
 
-This project uses [Changesets](https://github.com/changesets/changesets) to manage versioning and publishing of packages in the monorepo. Here's how to work with them:
+This project uses [Changesets](https://github.com/changesets/changesets) to manage versioning and publishing of packages in the monorepo.
+
+#### Version Strategy
+
+- **Root Package (`package.json`)**: Version remains permanently at `"0.0.0"`. This is a private coordination package that handles build/dev tooling and is never published to NPM.
+- **Workspace Packages (`packages/*/package.json`)**: Managed exclusively via changesets. These are the packages published to NPM with automatic versioning.
 
 #### Creating a Changeset
 
-When you make changes that should trigger a new release, run the following in the top level directory:
+When you make changes that should trigger a new release of workspace packages, run:
 ```bash
 pnpm changeset
 ```
@@ -56,10 +61,19 @@ This will:
 
 #### Version Bump Guidelines
 
-Follow semantic versioning:
+Follow semantic versioning for workspace packages:
 - **Patch** (1.0.0 → 1.0.1): Bug fixes, small improvements
 - **Minor** (1.0.0 → 1.1.0): New features, non-breaking changes
 - **Major** (1.0.0 → 2.0.0): Breaking changes
+
+#### Important: Never Manually Update Package Versions
+
+- ❌ **Don't** manually edit version fields in any `package.json` files
+- ❌ **Don't** change the root `package.json` version from `"0.0.0"`
+- ✅ **Do** use `pnpm changeset` to create version change requests
+- ✅ **Do** let the CI/CD system handle automated versioning and publishing
+
+The CI system will automatically reject PRs that contain manual version changes to ensure consistency and prevent conflicts with the changeset workflow.
 
 #### Changeset Files
 

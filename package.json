@@ -1,7 +1,7 @@
 {
   "name": "shinzo",
   "version": "0.0.0",
-  "description": "Composable analytics stack for MCP servers.",
+  "description": "Composable MCP analytics stack",
   "type": "commonjs",
   "private": true,
   "engines": {
@@ -34,9 +34,9 @@
   },
   "keywords": [
     "mcp",
+    "analytics",
     "opentelemetry",
     "observability",
-    "analytics",
     "telemetry",
     "tracing",
     "monitoring",
