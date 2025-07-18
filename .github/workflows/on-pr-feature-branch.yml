@@ -49,9 +49,25 @@ jobs:
       - name: Validate package versions
         run: |
           # Check if any package versions have been manually bumped without changesets
+          # Allow changes to "0.0.0" (initial setup) and from changeset release PRs
+          if [[ "${{ github.head_ref }}" == changeset-release/* ]]; then
+            echo "Skipping version validation for changeset release PR"
+            exit 0
+          fi
+          
           git diff --name-only origin/main...HEAD | grep 'package\.json$' | while read file; do
             if git diff origin/main...HEAD "$file" | grep -q '"version"'; then
+              # Get the version changes
+              version_changes=$(git diff origin/main...HEAD "$file" | grep '"version"')
+              
+              # Allow changes to/from "0.0.0" (initial setup)
+              if echo "$version_changes" | grep -q '"0.0.0"'; then
+                echo "✅ Allowing version change to/from 0.0.0 in $file (initial setup)"
+                continue
+              fi
+              
               echo "⚠️  Version change detected in $file without changeset"
+              echo "Changes: $version_changes"
               echo "Please use 'pnpm changeset' to manage version bumps"
               exit 1
             fi
