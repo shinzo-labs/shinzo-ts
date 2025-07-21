@@ -1,5 +1,11 @@
 # @shinzo/instrumentation-mcp
 
+## 1.0.5
+
+### Patch Changes
+
+- 56e7776: Update clean script
+
 ## 1.0.4
 
 ### Patch Changes
