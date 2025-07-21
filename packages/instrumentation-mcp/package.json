@@ -18,7 +18,7 @@
     "test:unit": "jest --testNamePattern=\"^(?!.*Integration Tests).*\" --passWithNoTests",
     "lint": "eslint src/**/*.ts",
     "prepare": "pnpm run build",
-    "clean": "rm -rf dist coverage .nyc_output junit.xml test-results.xml",
+    "clean": "rm -rf dist coverage .nyc_output junit.xml test-results.xml *.tsbuildinfo",
     "prepack": "pnpm run clean && pnpm run build",
     "type-check": "tsc --noEmit",
     "test:ci": "jest --coverage --ci --watchAll=false --passWithNoTests"
