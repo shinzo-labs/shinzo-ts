@@ -30,7 +30,7 @@
     "clean": "pnpm -r run clean",
     "prepare": "pnpm run build",
     "prepack": "pnpm run clean && pnpm run build",
-    "publish": "pnpm -r --filter !shinzo publish --access public"
+    "publish": "pnpm run build && pnpm -r --filter !shinzo publish --access public"
   },
   "keywords": [
     "mcp",
