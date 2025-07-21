@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import os from 'os'
+import * as os from 'os'
 
 export const generateUuid = () => {
   return uuidv4()
