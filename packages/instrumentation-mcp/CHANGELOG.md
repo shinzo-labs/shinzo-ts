@@ -1,5 +1,11 @@
 # @shinzo/instrumentation-mcp
 
+## 1.0.6
+
+### Patch Changes
+
+- 2f2248a: Resolve minor bugs with tool telemetry exporting
+
 ## 1.0.5
 
 ### Patch Changes
