@@ -10,7 +10,6 @@ export class PIISanitizer {
       /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, // Email addresses
       /\b\d{3}[\s-]?\d{3}[\s-]?\d{4}\b/g, // Phone numbers
       /\b(?:api[_-]?key|secret|token|password|passwd|pwd)\s*[:=]\s*["']?([^"'\s]+)/gi, // API keys and secrets
-      /\b[A-Za-z0-9]{20,}\b/g, // Long tokens/keys
       /\b(?:Bearer|Basic)\s+[A-Za-z0-9+/=]+/gi, // Auth headers
     ]
   }

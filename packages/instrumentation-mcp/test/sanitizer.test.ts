@@ -78,19 +78,6 @@ describe('PIISanitizer', () => {
       expect(result.parameters?.config).toBe('[REDACTED]')
     })
 
-    it('should sanitize long tokens', () => {
-      const data: any = {
-        timestamp: Date.now(),
-        sessionId: 'test-session',
-        methodName: 'test',
-        parameters: {
-          token: 'abcdefghijklmnopqrstuvwxyz123456789'
-        }
-      }
-
-      const result = sanitizer.sanitize(data)
-      expect(result.parameters?.token).toBe('[REDACTED]')
-    })
 
     it('should sanitize auth headers', () => {
       const data: any = {
