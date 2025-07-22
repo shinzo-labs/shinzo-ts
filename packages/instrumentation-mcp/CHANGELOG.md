@@ -1,5 +1,11 @@
 # @shinzo/instrumentation-mcp
 
+## 1.0.7
+
+### Patch Changes
+
+- e43b57f: Install correct @opentelemetry/api package dep version"
+
 ## 1.0.6
 
 ### Patch Changes
