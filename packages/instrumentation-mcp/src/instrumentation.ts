@@ -77,7 +77,6 @@ export class McpServerInstrumentation {
   }
 
   private createInstrumentedHandler(originalHandler: (...args: any[]) => any, method: string, name: string): (...args: any[]) => any {
-    const requestId = generateUuid()
     const { address, port } = getRuntimeInfo()
 
     const baseAttributes = {
@@ -98,7 +97,7 @@ export class McpServerInstrumentation {
     return async (params: any) => {
       const spanAttributes = {
         ...baseAttributes,
-        'mcp.request.id': requestId,
+        'mcp.request.id': generateUuid(),
         'client.address': address,
         ...(port ? { 'client.port': port } : {}),
         ...(this.telemetryManager.getArgumentAttributes(params))
