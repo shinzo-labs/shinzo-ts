@@ -19,7 +19,8 @@ export class PIISanitizer {
       detect: () => new Resource({
         'client.address': '[REDACTED]',
         'client.port': '[REDACTED]',
-        'host.id': '[REDACTED]'
+        'host.id': '[REDACTED]',
+        'host.name': '[REDACTED]'
       })
     }
   }
