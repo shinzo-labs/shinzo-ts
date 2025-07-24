@@ -171,7 +171,7 @@ Enterprise licenses are available for additional features and support through [S
 
 We believe that the fair-code license model offers a strong compromise between democratizing the benefits of open software while ensuring long-term sustainability of software maintenance and operations. Our specific license model is adapted from [n8n](https://github.com/n8n-io/n8n/tree/master), with additional context for the origin of the licenses [here](https://docs.n8n.io/reference/license/).
 
-Some of this software's capabilities enable developers and businesses to collect data on usage of products by respective end users. Shinzo Labs takes no responsibility for how this software is used by other developer, and by using this software you accept all terms of the relevant licenses, including the section on [No Liability](./LICENSE.md#no-liability).
+Some of this software's capabilities enable developers and businesses to collect data on usage of products by respective end users. Shinzo Labs accepts no responsibility for how this software is used by other developers, and by using this software you accept all terms of the relevant licenses, including the section on [No Liability](./LICENSE.md#no-liability).
 
 ## 📞 Contact
 
