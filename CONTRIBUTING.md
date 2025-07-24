@@ -8,7 +8,7 @@ Contributions to this codebase are welcomed and appreciated. We encourage novice
 
 - **Build as a community**: Centralized development, decentralized input. We ship early, iterate fast, and reward contributors.
 - **Lean on battle-tested technology**: Prefer proven, stable software over experimental solutions.
-- **Develop a composable architecture**: Every component works independently; use only what you need.
+- **Develop a modular architecture**: Every component works independently; use only what you need.
 - **Performance is a top priority**: Minimal overhead, maximum insight.
 - **Democratize the power of AI**: Build open, accessible tools for all agentic developers.
 

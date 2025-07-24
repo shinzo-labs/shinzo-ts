@@ -19,7 +19,7 @@ pnpm add @shinzolabs/instrumentation-mcp
 
 ## Usage
 
-For minimal-footprint usage, just pass in the server name, version, and exporter endpoint:
+For the simplest configuration, just pass in the server name, version, and exporter endpoint:
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
@@ -48,7 +48,7 @@ const telemetry = instrumentServer(server, telemetryConfig)
 server.tool(...)
 ```
 
-The TelemetryConfig also exposes a number of other options for precise telemetry processing:
+The TelemetryConfig exposes a number of other options for precise and expansive telemetry processing:
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
@@ -180,9 +180,9 @@ const telemetryConfig: TelemetryConfig = {
 
 ## Features
 
-- **Automatic Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.
-- **Anonymous, Configurable Telemetry**: Built-in PII sanitization and data processing features help you stay compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation effortlessly.
-- **OpenTelemetry-Compatible**: Fully compatible with OpenTelemetry standards and can be used with any OpenTelemetry-compatible service. See [OpenTelemetry vendors](https://opentelemetry.io/ecosystem/vendors/) for available collector options.
+- **Automatic Instrumentation**: One line of code gives you instant instrumentation for your MCP server's capabilities.
+- **Configurable Telemetry, Anonymous by Default**: Built-in PII sanitization and data processing features help you stay compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation effortlessly.
+- **OpenTelemetry-Compatible**: Since the entire system meets OpenTelemetry standard conventions, developers can mix-and-match our modules with any [OpenTelemetry-compatible service](https://opentelemetry.io/ecosystem/vendors/).
 
 ## Documentation
 

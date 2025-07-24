@@ -31,7 +31,12 @@
     "telemetry",
     "tracing",
     "monitoring",
-    "instrumentation"
+    "instrumentation",
+    "modular",
+    "composable",
+    "stack",
+    "agent",
+    "ai"
   ],
   "dependencies": {
     "@opentelemetry/api": "1.8.0",

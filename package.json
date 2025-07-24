@@ -1,7 +1,7 @@
 {
   "name": "shinzo",
   "version": "0.0.0",
-  "description": "Composable MCP analytics stack",
+  "description": "Modular analytics for MCP servers",
   "type": "commonjs",
   "private": true,
   "engines": {
@@ -41,9 +41,11 @@
     "tracing",
     "monitoring",
     "instrumentation",
+    "modular",
     "composable",
     "stack",
-    "agent"
+    "agent",
+    "ai"
   ],
   "repository": {
     "type": "git",
