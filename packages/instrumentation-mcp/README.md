@@ -181,7 +181,7 @@ const telemetryConfig: TelemetryConfig = {
 ## Features
 
 - **Automatic Instrumentation**: One line of code gives you instant instrumentation for all the capabilities on your MCP server.
-- **Anonymous, Configurable Telemetry**: Built-in PII sanitization and user consent mechanisms ensure you always remain compliant with GDPR, CCPA/CPRA and other data privacy regulation.
+- **Anonymous, Configurable Telemetry**: Built-in PII sanitization and data processing features help you stay compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation effortlessly.
 - **OpenTelemetry-Compatible**: Fully compatible with OpenTelemetry standards and can be used with any OpenTelemetry-compatible service. See [OpenTelemetry vendors](https://opentelemetry.io/ecosystem/vendors/) for available collector options.
 
 ## Documentation
@@ -190,7 +190,7 @@ For complete documentation, examples, and guides, visit the [main Shinzo reposit
 
 ## License
 
-This package is part of the [Shinzo](https://github.com/shinzo-labs/shinzo-ts) project and is distributed under the [Sustainable Use License](https://github.com/shinzo-labs/shinzo-ts/blob/main/LICENSE.md).
+This package is part of the [Shinzo](https://github.com/shinzo-labs/shinzo-ts) project and is distributed under the relevant licenses specified in [License](https://github.com/shinzo-labs/shinzo-ts#-license).
 
 ## Contributing
 

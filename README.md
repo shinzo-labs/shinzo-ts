@@ -45,7 +45,7 @@ Shinzo is an open, composable analytics stack purpose-built for developers and p
 ### ✨ Key Features
 
 - **Automatic Instrumentation**: One line of code gives you instant instrumentation for your MCP server's capabilities.
-- **Anonymous, Configurable Telemetry**: Built-in PII sanitization and user consent mechanisms ensure you always remain compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation.
+- **Anonymous, Configurable Telemetry**: Built-in PII sanitization and data processing features help you stay compliant with [GDPR](https://gdpr.eu/what-is-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa)/[CPRA](https://thecpra.org/) and other data privacy regulation effortlessly.
 - **Full Control**: All components of Shinzo can be self-hosted with our sustainable use license or cloud hosted through Shinzo Labs.
 - **Custom Analytics Dashboards**: Self-hosted, real-time dashboards for tool usage, performance, and traces.
 - **OpenTelemetry-Compatible**: Since the entire stack meets OpenTelemetry standard conventions, developers can mix-and-match our components with any OpenTelemetry-compatible service. See [OpenTelemetry vendors](https://opentelemetry.io/ecosystem/vendors/) for available options.
@@ -174,6 +174,10 @@ We believe that the fair-code license model offers a strong compromise between d
 ## 📞 Contact
 
 Contact Austin Born (austin@shinzolabs.com, [@austinbuilds](https://x.com/austinbuilds)) if you have any questions or comments related to this software.
+
+## Data Collection Notice
+
+Some of this software's capabilities enable developers and businesses to collect data on usage of products by respective end users. Shinzo Labs takes no responsibility for how this software is used by other developer, and by using this software you accept all terms of the [Sustainable Use License](./LICENSE.md), including the section on [No Liability](./LICENSE.md#no-liability).
 
 ## 📚 Additional Resources
 
