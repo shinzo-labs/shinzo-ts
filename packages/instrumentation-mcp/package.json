@@ -1,6 +1,6 @@
 {
   "name": "@shinzolabs/instrumentation-mcp",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "OpenTelemetry instrumentation for MCP servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -1,5 +1,11 @@
 # @shinzo/instrumentation-mcp
 
+## 1.0.8
+
+### Patch Changes
+
+- 8cb568f: Redact host.name by default, update branding
+
 ## 1.0.7
 
 ### Patch Changes
