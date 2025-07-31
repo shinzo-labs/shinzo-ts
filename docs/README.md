@@ -9,6 +9,8 @@
   </p>
 </div>
 
+```
 docs/
 └── open-telemetry-dashboards/
     └── signoz-template.json         # Template JSON for MCP server tool calls in SigNoz
+```
