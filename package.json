@@ -1,7 +1,7 @@
 {
   "name": "shinzo",
   "version": "0.0.0",
-  "description": "Modular analytics for MCP servers",
+  "description": "Complete Observability for MCP servers",
   "type": "commonjs",
   "private": true,
   "engines": {
