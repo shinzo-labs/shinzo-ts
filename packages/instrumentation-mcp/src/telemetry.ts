@@ -174,6 +174,21 @@ export class TelemetryManager implements ObservabilityInstance {
     return attributes
   }
 
+  public reportClientInfo(clientInfo: { name: string; version?: string }): void {
+    if (!this.config.enableMetrics) return
+
+    // Report client info as a metric
+    const incrementCounter = this.getIncrementCounter('mcp.client.connections', {
+      description: 'Count of MCP client connections by client type and version',
+      unit: 'connections'
+    })
+
+    incrementCounter(1, {
+      'mcp.client.name': clientInfo.name,
+      'mcp.client.version': clientInfo.version || 'unknown'
+    })
+  }
+
   private recordSessionDuration(): void {
     if (this.config.enableMetrics) {
       const recordHistogram = this.getHistogram('mcp.server.session.duration', {

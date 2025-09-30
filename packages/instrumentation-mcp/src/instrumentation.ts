@@ -7,6 +7,7 @@ export class McpServerInstrumentation {
   private telemetryManager: TelemetryManager
   private server: McpServer
   private isInstrumented: boolean = false
+  private clientVersionReported: boolean = false
 
   constructor(server: McpServer, telemetryManager: TelemetryManager) {
     this.server = server
@@ -25,7 +26,19 @@ export class McpServerInstrumentation {
     this.instrumentResources()
     this.instrumentRoots()
     this.instrumentSampling()
+    this.reportClientVersion()
     this.isInstrumented = true
+  }
+
+  private reportClientVersion(): void {
+    // Report client version once at the beginning
+    if (this.clientVersionReported) return
+
+    const clientInfo = this.server.getClientVersion()
+    if (clientInfo) {
+      this.telemetryManager.reportClientInfo(clientInfo)
+      this.clientVersionReported = true
+    }
   }
 
   private instrumentTools(): void {
@@ -95,11 +108,21 @@ export class McpServerInstrumentation {
     })
 
     return async (params: any) => {
+      // Report client version on first request if not already reported
+      if (!this.clientVersionReported) {
+        this.reportClientVersion()
+      }
+
+      const clientInfo = this.server.getClientVersion()
       const spanAttributes = {
         ...baseAttributes,
         'mcp.request.id': generateUuid(),
         'client.address': address,
         ...(port ? { 'client.port': port } : {}),
+        ...(clientInfo ? {
+          'mcp.client.name': clientInfo.name,
+          'mcp.client.version': clientInfo.version
+        } : {}),
         ...(this.telemetryManager.getArgumentAttributes(params))
       }
 
