@@ -8,7 +8,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 export function instrumentServer(
   server: McpServer,
   config: TelemetryConfig
-): ObservabilityInstance {
+): ObservabilityInstance & { instrumentation: McpServerInstrumentation } {
   const telemetryManager = new TelemetryManager(config)
   const instrumentation = new McpServerInstrumentation(server, telemetryManager)
   instrumentation.instrument()
@@ -28,13 +28,17 @@ export function instrumentServer(
     },
     shutdown: async () => {
       await telemetryManager.shutdown()
-    }
+    },
+    instrumentation
   }
 }
 
 export { TelemetryManager } from './telemetry'
 export { PIISanitizer } from './sanitizer'
 export { ConfigValidator } from './config'
+export { McpServerInstrumentation } from './instrumentation'
+export { SessionTracker } from './session'
+export type { SessionEvent } from './session'
 
 export type {
   AuthConfig,

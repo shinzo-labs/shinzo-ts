@@ -204,6 +204,10 @@ export class TelemetryManager implements ObservabilityInstance {
     return processedData
   }
 
+  public getConfig(): TelemetryConfig {
+    return this.config
+  }
+
   public async shutdown(): Promise<void> {
     this.recordSessionDuration()
 

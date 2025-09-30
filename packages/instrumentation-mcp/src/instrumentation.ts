@@ -2,15 +2,44 @@ import { TelemetryManager } from './telemetry'
 import { Span, SpanStatusCode } from '@opentelemetry/api'
 import { generateUuid, getRuntimeInfo } from './utils'
 import { McpServer, RegisteredTool } from '@modelcontextprotocol/sdk/server/mcp'
+import { SessionTracker, SessionEvent } from './session'
 
 export class McpServerInstrumentation {
   private telemetryManager: TelemetryManager
   private server: McpServer
   private isInstrumented: boolean = false
+  private sessionTracker: SessionTracker | null = null
 
   constructor(server: McpServer, telemetryManager: TelemetryManager) {
     this.server = server
     this.telemetryManager = telemetryManager
+  }
+
+  /**
+   * Enable session tracking for debugging and replay
+   */
+  public enableSessionTracking(resourceUuid: string, metadata?: Record<string, any>): void {
+    if (!this.sessionTracker) {
+      this.sessionTracker = new SessionTracker(this.telemetryManager.getConfig(), resourceUuid)
+      void this.sessionTracker.start(metadata)
+    }
+  }
+
+  /**
+   * Get the session tracker instance
+   */
+  public getSessionTracker(): SessionTracker | null {
+    return this.sessionTracker
+  }
+
+  /**
+   * Complete the current session
+   */
+  public async completeSession(): Promise<void> {
+    if (this.sessionTracker) {
+      await this.sessionTracker.complete()
+      this.sessionTracker = null
+    }
   }
 
   public instrument(): void {
@@ -110,13 +139,54 @@ export class McpServerInstrumentation {
         let error: any
 
         const startTime = Date.now()
+        const startTimestamp = new Date()
+
+        // Track tool call event if session tracking is enabled
+        if (this.sessionTracker?.isSessionActive()) {
+          this.sessionTracker.addEvent({
+            timestamp: startTimestamp,
+            event_type: 'tool_call',
+            tool_name: name,
+            input_data: this.telemetryManager.getConfig().enableArgumentCollection ? params : undefined,
+            metadata: { method }
+          })
+        }
 
         try {
           result = await originalHandler.apply(this.server, [params])
           span.setStatus({ code: SpanStatusCode.OK })
-        } catch (error) {
+
+          // Track successful tool response
+          if (this.sessionTracker?.isSessionActive()) {
+            this.sessionTracker.addEvent({
+              timestamp: new Date(),
+              event_type: 'tool_response',
+              tool_name: name,
+              output_data: this.telemetryManager.getConfig().enableArgumentCollection ? result : undefined,
+              duration_ms: Date.now() - startTime,
+              metadata: { method }
+            })
+          }
+        } catch (err) {
+          error = err
           span.setStatus({ code: SpanStatusCode.ERROR, message: (error as Error).message })
           span.setAttribute('error.type', (error as Error).name)
+
+          // Track error event
+          if (this.sessionTracker?.isSessionActive()) {
+            this.sessionTracker.addEvent({
+              timestamp: new Date(),
+              event_type: 'error',
+              tool_name: name,
+              error_data: {
+                message: (error as Error).message,
+                name: (error as Error).name,
+                stack: (error as Error).stack
+              },
+              duration_ms: Date.now() - startTime,
+              metadata: { method }
+            })
+          }
         }
 
         const endTime = Date.now()
