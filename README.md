@@ -14,7 +14,7 @@
     </p>
     <div align="center">
       <a href="https://youtu.be/OtBTAfbBr-w">
-        <img src="https://github.com/user-attachments/assets/d27d101a-68c8-448d-a13c-9aeb42959ec6" alt="Shinzo Product Demo Video" width="560" height="315">
+        <img src="https://github.com/user-attachments/assets/53783d00-2c47-4065-9614-bd381aaa21d6" alt="Shinzo Product Demo Video" width="560" height="315">
       </a>
     </div>
     Shinzo is the first observability solution purpose-built for MCP servers with complete OpenTelemetry compatibility. Gain insight into agent usage patterns, contextualize tool calls, and analyze performance of your servers across platforms. Instrumentation can be installed in servers in just a few steps with an emphasis on ease of use and flexibility.
