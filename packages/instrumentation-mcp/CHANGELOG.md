@@ -1,5 +1,11 @@
 # @shinzo/instrumentation-mcp
 
+## 1.0.9
+
+### Patch Changes
+
+- 2aeedc4: Update README wording
+
 ## 1.0.8
 
 ### Patch Changes
