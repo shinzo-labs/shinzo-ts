@@ -2,7 +2,7 @@
 
 Portions of this software are licensed as follows:
 
-- Content of branches other than the main branch (i.e. "master") are not licensed.
+- Content of branches other than the main branch (i.e. "main") are not licensed.
 - Source code files that contain ".ee." in their filename or ".ee" in their dirname are NOT licensed under
   the Sustainable Use License.
   To use source code files that contain ".ee." in their filename or ".ee" in their dirname you must hold a
@@ -11,7 +11,8 @@ Portions of this software are licensed as follows:
 - All third party components incorporated into the Shinzo Software are licensed under the original license
   provided by the owner of the applicable component.
 - Content outside of the above mentioned files or restrictions is available under the "Sustainable Use
-  License" as defined below.
+  License" as defined below, except where separate licenses are provided for specific packages. This currently includes the following packages:
+  - [@shinzolabs/instrumentation-mcp](./packages/instrumentation-mcp)
 
 ## Sustainable Use License
 

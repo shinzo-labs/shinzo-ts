@@ -171,7 +171,7 @@ Contributions to Shinzo are appreciated, whether you are a veteran building soph
 
 ## 📄 License
 
-Shinzo is [fair-code](https://faircode.io) software distributed under the [Sustainable Use License](./LICENSE.md) and [Shinzo Enterprise License](./LICENSE_EE.md).
+Shinzo is [fair-code](https://faircode.io) software distributed under the [Sustainable Use License](./LICENSE.md) and [Shinzo Enterprise License](./LICENSE_EE.md), except where packages are explicitly distributed under separate licenses (currently this includes [@shinzolabs/instrumentation-mcp](./packages/instrumentation-mcp)).
 
 - **Source Available**: Always visible source code
 - **Self-Hostable**: Deploy anywhere

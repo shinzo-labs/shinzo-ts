@@ -190,7 +190,7 @@ For complete documentation, examples, and guides, visit the [main Shinzo reposit
 
 ## License
 
-This package is part of the [Shinzo](https://github.com/shinzo-labs/shinzo-ts) project and is distributed under the relevant licenses specified in [License](https://github.com/shinzo-labs/shinzo-ts#-license).
+This package is distributed under the [MIT License](./LICENSE.md), separate from the [Sustainable Use License](https://github.com/shinzo-labs/shinzo-ts#license) of the parent repository.
 
 ## Contributing
 
