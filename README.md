@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/shinzo-labs/shinzo-ts">
-    <img src="https://github.com/user-attachments/assets/78542e5b-1da1-44ad-a3e2-5b4eb9e6a962" alt="Shinzo Logo" width="180" height="180">
+    <img src="https://github.com/user-attachments/assets/64f5e0ae-6924-41b1-b1da-1b22627e5c43" alt="Shinzo Logo" width="180" height="180">
   </a>
   <h1 align="center">
     Shinzo TypeScript SDK: Complete Observability for MCP Servers
