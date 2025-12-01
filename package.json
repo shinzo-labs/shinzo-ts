@@ -21,7 +21,8 @@
     "clean": "rm -rf dist coverage .nyc_output junit.xml test-results.xml *.tsbuildinfo",
     "prepack": "pnpm run clean && pnpm run build",
     "type-check": "tsc --noEmit",
-    "test:ci": "jest --coverage --ci --watchAll=false --passWithNoTests"
+    "test:ci": "jest --coverage --ci --watchAll=false --passWithNoTests",
+    "changeset": "changeset"
   },
   "keywords": [
     "mcp",

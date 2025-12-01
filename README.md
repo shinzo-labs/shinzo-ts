@@ -21,8 +21,6 @@
 ## Installation
 
 ```bash
-npm install @shinzolabs/instrumentation-mcp
-# or
 pnpm add @shinzolabs/instrumentation-mcp
 ```
 

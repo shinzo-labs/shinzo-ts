@@ -23,7 +23,7 @@ Once you have been assigned an issue, the steps to contribute are:
 2. Open a branch with a name prefixed with `feat/`, `fix/`, or `chore/` depending on the nature of the change. Use your best judgement when deciding on the prefix.
 3. Implement the desired changes.
 4. Add tests to any relevant test suites to validate functionality.
-5. Create a changeset for your changes by running `npx @changesets/cli` (or `pnpm changeset`) from the root of the repository. This will prompt you to select which packages are affected and describe the changes. Choose the appropriate version bump type (patch, minor, or major) based on semantic versioning principles.
+5. Create a changeset for your changes by running `pnpm changeset` from the root of the repository. This will prompt you to select which packages are affected and describe the changes. Choose the appropriate version bump type (patch, minor, or major) based on semantic versioning principles.
 6. Open a Pull Request from your forked repo back to the main repo. Tag one of the core contributors as a reviewer.
 7. Once the core contributor has reviewed the code and all comments have been resolved, the PR will be approved and merged into the `main` branch.
 8. When your PR is merged, the changeset will be used to automatically create a release PR with proper version bumps and changelogs. Once the release PR is merged, updated packages will be published to npm automatically.
