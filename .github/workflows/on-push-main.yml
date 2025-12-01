@@ -127,7 +127,7 @@ jobs:
       - name: Publish packages
         uses: changesets/action@v1
         with:
-          publish: pnpm run publish
+          publish: pnpm publish --access public --no-git-checks
           title: "Release packages"
           createGithubReleases: true
         env:
