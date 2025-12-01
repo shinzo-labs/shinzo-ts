@@ -1,42 +1,33 @@
 {
-  "name": "shinzo",
-  "version": "0.0.0",
-  "description": "Complete Observability for MCP servers",
-  "type": "commonjs",
-  "private": true,
+  "name": "@shinzolabs/instrumentation-mcp",
+  "version": "1.0.9",
+  "description": "OpenTelemetry instrumentation for MCP servers",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "engines": {
-    "node": ">=22.16",
-    "pnpm": ">=10.2.1"
-  },
-  "packageManager": "pnpm@10.12.1",
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "*": "*"
-      }
-    }
+    "node": ">=22.16"
   },
   "scripts": {
-    "build": "pnpm -r run build",
-    "dev": "pnpm -r --parallel run dev",
-    "test": "pnpm -r run test",
-    "test:watch": "pnpm -r --parallel run test:watch",
-    "test:coverage": "pnpm -r run test:coverage",
-    "test:unit": "pnpm -r run test:unit",
-    "test:integration": "pnpm -r run test:integration",
-    "test:ci": "pnpm -r run test:ci",
-    "lint": "pnpm -r run lint",
-    "type-check": "pnpm -r run type-check",
-    "clean": "pnpm -r run clean",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "test:runner": "ts-node test/test-runner.ts",
+    "test:integration": "jest --testNamePattern=\"Integration Tests\" --passWithNoTests",
+    "test:unit": "jest --testNamePattern=\"^(?!.*Integration Tests).*\" --passWithNoTests",
+    "lint": "eslint src/**/*.ts",
     "prepare": "pnpm run build",
+    "clean": "rm -rf dist coverage .nyc_output junit.xml test-results.xml *.tsbuildinfo",
     "prepack": "pnpm run clean && pnpm run build",
-    "publish": "pnpm run build && pnpm -r --filter !shinzo publish --access public"
+    "type-check": "tsc --noEmit",
+    "test:ci": "jest --coverage --ci --watchAll=false --passWithNoTests"
   },
   "keywords": [
     "mcp",
-    "analytics",
     "opentelemetry",
     "observability",
+    "analytics",
     "telemetry",
     "tracing",
     "monitoring",
@@ -47,21 +38,26 @@
     "agent",
     "ai"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/shinzo-labs/shinzo-ts.git"
+  "dependencies": {
+    "@opentelemetry/api": "1.8.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.46.1",
+    "@opentelemetry/core": "^1.24.1",
+    "@opentelemetry/exporter-metrics-otlp-http": "^0.51.1",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.51.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.51.1",
+    "@opentelemetry/instrumentation": "^0.51.1",
+    "@opentelemetry/resources": "^1.24.1",
+    "@opentelemetry/sdk-metrics": "^1.24.1",
+    "@opentelemetry/sdk-node": "^0.51.1",
+    "@opentelemetry/sdk-trace-base": "^1.24.1",
+    "@opentelemetry/semantic-conventions": "^1.24.1",
+    "uuid": "^11.1.0",
+    "zod": "^3.25.75"
   },
-  "homepage": "https://github.com/shinzo-labs/shinzo-ts",
-  "bugs": {
-    "url": "https://github.com/shinzo-labs/shinzo-ts/issues"
-  },
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
-    "@changesets/cli": "^2.27.9",
     "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
@@ -69,5 +65,17 @@
     "ts-jest": "^29.0.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": "^1.15.1"
+  },
+  "files": [
+    "README.md",
+    "dist/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shinzo-labs/shinzo-ts.git",
+    "directory": "packages/instrumentation-mcp"
   }
 }
