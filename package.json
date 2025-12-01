@@ -75,7 +75,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shinzo-labs/shinzo-ts.git",
-    "directory": "packages/instrumentation-mcp"
+    "url": "git+https://github.com/shinzo-labs/shinzo-ts.git"
   }
 }

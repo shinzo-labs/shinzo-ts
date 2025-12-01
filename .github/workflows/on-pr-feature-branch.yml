@@ -27,61 +27,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.12.1
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          cache: 'npm'
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
       - name: Check for changeset
-        run: npx @changesets/cli status --since=origin/main
+        run: npm run changeset status -- --since=origin/main
       - name: Validate package versions
         run: |
-          # Check if any package versions have been manually bumped without changesets
-          # Allow changes to "0.0.0" (initial setup) and from changeset release PRs
+          # Check if package version has been manually bumped without changesets
           if [[ "${{ github.head_ref }}" == changeset-release/* ]]; then
             echo "Skipping version validation for changeset release PR"
             exit 0
           fi
-          
-          git diff --name-only origin/main...HEAD | grep 'package\.json$' | while read file; do
-            # Get the old and new version numbers
-            old_version=$(git show origin/main:"$file" | grep '"version":' | sed 's/.*"version": "\([^"]*\)".*/\1/')
-            new_version=$(git show HEAD:"$file" | grep '"version":' | sed 's/.*"version": "\([^"]*\)".*/\1/')
-            
-            # Check if versions are different
+
+          # Check if package.json version changed
+          if git diff --name-only origin/main...HEAD | grep -q '^package\.json$'; then
+            old_version=$(git show origin/main:package.json | grep '"version":' | sed 's/.*"version": "\([^"]*\)".*/\1/')
+            new_version=$(git show HEAD:package.json | grep '"version":' | sed 's/.*"version": "\([^"]*\)".*/\1/')
+
             if [[ "$old_version" != "$new_version" ]]; then
-              # Allow changes to/from "0.0.0" (initial setup only)
-              if [[ "$old_version" == "0.0.0" ]] || [[ "$new_version" == "0.0.0" ]]; then
-                echo "✅ Allowing version change to/from 0.0.0 in $file (initial setup)"
-                continue
-              fi
-              
-              # Root package.json should remain at 0.0.0 (private coordination package)
-              if [[ "$file" == "package.json" ]]; then
-                echo "⚠️  Root package.json version should remain at 0.0.0"
-                echo "Only workspace packages should be versioned via changesets"
-                echo "Version changed from $old_version to $new_version"
-                exit 1
-              fi
-              
-              echo "⚠️  Version change detected in $file without changeset"
+              echo "⚠️  Version change detected in package.json without changeset"
               echo "Version changed from $old_version to $new_version"
-              echo "Please use 'pnpm changeset' to manage version bumps"
+              echo "Please use 'npm run changeset' to manage version bumps"
               exit 1
             fi
-          done
+          fi
 
   validate-build:
     name: Validate build and tests
@@ -93,31 +63,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.12.1
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          cache: 'npm'
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
       - name: Run linting
-        run: pnpm run lint
+        run: npm run lint
       - name: Run type checking
-        run: pnpm run type-check
+        run: npm run type-check
       - name: Run tests
-        run: pnpm run test:ci
+        run: npm run test:ci
       - name: Build packages
-        run: pnpm run build
+        run: npm run build
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
