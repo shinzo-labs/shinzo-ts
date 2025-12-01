@@ -1,5 +1,15 @@
 # @shinzo/instrumentation-mcp
 
+## 1.1.0
+
+### Minor Changes
+
+- 43c915b: Update instrumentation-mcp codebase from monorepo to single package library
+
+### Patch Changes
+
+- 3af55c9: Update logo
+
 ## 1.0.9
 
 ### Patch Changes
