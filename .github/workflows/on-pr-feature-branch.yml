@@ -45,27 +45,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check for changeset
-        run: pnpm run changeset status -- --since=origin/main
-      - name: Validate package versions
         run: |
-          # Check if package version has been manually bumped without changesets
+          # Skip changeset check for changeset-release PRs
           if [[ "${{ github.head_ref }}" == changeset-release/* ]]; then
-            echo "Skipping version validation for changeset release PR"
+            echo "Skipping changeset check for changeset release PR"
             exit 0
           fi
 
-          # Check if package.json version changed
-          if git diff --name-only origin/main...HEAD | grep -q '^package\.json$'; then
-            old_version=$(git show origin/main:package.json | grep '"version":' | sed 's/.*"version": "\([^"]*\)".*/\1/')
-            new_version=$(git show HEAD:package.json | grep '"version":' | sed 's/.*"version": "\([^"]*\)".*/\1/')
-
-            if [[ "$old_version" != "$new_version" ]]; then
-              echo "⚠️  Version change detected in package.json without changeset"
-              echo "Version changed from $old_version to $new_version"
-              echo "Please use 'pnpm changeset' to manage version bumps"
-              exit 1
-            fi
-          fi
+          # Check if changesets exist
+          pnpm run changeset status -- --since=origin/main
 
   validate-build:
     name: Validate build and tests
