@@ -40,8 +40,8 @@ pnpm build
 # Navigate to the examples directory
 cd packages/instrumentation-mcp/examples
 
-# Run with ts-node
-npx ts-node basic-usage.ts
+# Run with ts-node (use --transpile-only to skip type checking)
+npx ts-node --transpile-only basic-usage.ts
 ```
 
 ## Environment Variables
@@ -64,7 +64,7 @@ Add to your Claude Desktop configuration file:
   "mcpServers": {
     "shinzo-basic-example": {
       "command": "npx",
-      "args": ["ts-node", "/path/to/shinzo/packages/instrumentation-mcp/examples/basic-usage.ts"],
+      "args": ["ts-node", "--transpile-only", "/path/to/shinzo/packages/instrumentation-mcp/examples/basic-usage.ts"],
       "env": {
         "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318/v1", // OpenTelemetry collector endpoint
         "OTEL_AUTH_TOKEN": "my-auth-token"

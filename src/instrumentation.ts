@@ -29,18 +29,30 @@ export class McpServerInstrumentation {
   }
 
   private instrumentTools(): void {
-    if (!this.server.tool || typeof this.server.tool !== 'function') {
-      return
-    }
-  
-    const originalTool = this.server.tool.bind(this.server)
+    // Instrument the deprecated tool() method
+    if (this.server.tool && typeof this.server.tool === 'function') {
+      const originalTool = this.server.tool.bind(this.server)
 
-    this.server.tool = (name: string, ...rest: any[]): RegisteredTool => {
-      const cb = rest[rest.length - 1] as (...args: any[]) => any
-      if (typeof cb === 'function') {
-        rest[rest.length - 1] = this.createInstrumentedHandler(cb, 'tools/call', name)
+      ;(this.server as any).tool = (name: string, ...rest: any[]): RegisteredTool => {
+        const cb = rest[rest.length - 1] as (...args: any[]) => any
+        if (typeof cb === 'function') {
+          rest[rest.length - 1] = this.createInstrumentedHandler(cb, 'tools/call', name)
+        }
+        return (originalTool as any)(name, ...rest)
       }
-      return (originalTool as any)(name, ...rest)
+    }
+
+    // Instrument the new registerTool() method
+    if (this.server.registerTool && typeof this.server.registerTool === 'function') {
+      const originalRegisterTool = this.server.registerTool.bind(this.server)
+
+      ;(this.server as any).registerTool = (name: string, config: any, cb: any): RegisteredTool => {
+        if (typeof cb === 'function') {
+          const instrumentedCb = this.createInstrumentedHandler(cb, 'tools/call', name)
+          return (originalRegisterTool as any)(name, config, instrumentedCb)
+        }
+        return (originalRegisterTool as any)(name, config, cb)
+      }
     }
   }
 

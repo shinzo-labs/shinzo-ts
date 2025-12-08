@@ -42,7 +42,7 @@ server.registerTool("add_numbers",
     return {
       content: [
         {
-          type: "text",
+          type: "text" as const,
           text: `The sum of ${params.numbers.join(" + ")} = ${sum}`
         }
       ]
@@ -60,7 +60,7 @@ server.registerTool("random_wait",
     return {
       content: [
         {
-          type: "text",
+          type: "text" as const,
           text: `Waited for ${waitTime.toFixed(2)} seconds`
         }
       ]
@@ -83,7 +83,7 @@ server.registerTool("create_story",
     return {
       content: [
         {
-          type: "text",
+          type: "text" as const,
           text: story
         }
       ]
