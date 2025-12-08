@@ -10,8 +10,7 @@ const VERSION = "1.2.0"
 // Create MCP server
 const server = new McpServer({
   name: NAME,
-  version: VERSION,
-  description: "Example MCP server with telemetry"
+  version: VERSION
 })
 
 // Configure telemetry with environment variable support
@@ -30,11 +29,13 @@ const telemetryConfig: TelemetryConfig = {
 // Initialize telemetry
 const telemetry = instrumentServer(server, telemetryConfig)
 
-// Add tools using the tool method
-server.tool("add_numbers",
-  "Adds a list of numbers together",
+// Add tools using the registerTool method
+server.registerTool("add_numbers",
   {
-    numbers: z.array(z.number()).describe("List of numbers to add together")
+    description: "Adds a list of numbers together",
+    inputSchema: {
+      numbers: z.array(z.number()).describe("List of numbers to add together")
+    }
   },
   async (params) => {
     const sum = params.numbers.reduce((acc, num) => acc + num, 0)
@@ -49,9 +50,10 @@ server.tool("add_numbers",
   }
 )
 
-server.tool("random_wait",
-  "Waits for a random number of seconds between 0 and 3, then returns the duration",
-  {},
+server.registerTool("random_wait",
+  {
+    description: "Waits for a random number of seconds between 0 and 3, then returns the duration"
+  },
   async () => {
     const waitTime = Math.random() * 3 // Random time between 0 and 3 seconds
     await new Promise(resolve => setTimeout(resolve, waitTime * 1000))
@@ -66,13 +68,15 @@ server.tool("random_wait",
   }
 )
 
-server.tool("create_story",
-  "Creates a short story using provided words like madlibs",
+server.registerTool("create_story",
   {
-    noun: z.string().describe("A noun (person, place, or thing)"),
-    verb: z.string().describe("An action verb"),
-    adjective: z.string().describe("A descriptive word"),
-    location: z.string().describe("A place or location")
+    description: "Creates a short story using provided words like madlibs",
+    inputSchema: {
+      noun: z.string().describe("A noun (person, place, or thing)"),
+      verb: z.string().describe("An action verb"),
+      adjective: z.string().describe("A descriptive word"),
+      location: z.string().describe("A place or location")
+    }
   },
   async (params) => {
     const story = `Once upon a time, there was a ${params.adjective} ${params.noun} who loved to ${params.verb}. One day, they decided to visit ${params.location}. It was the most amazing adventure they had ever experienced!`
